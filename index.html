@@ -1,0 +1,113 @@
+<!-- <!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Auxiliador de AR</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 2rem; }
+    input { margin-right: 1rem; }
+    table { border-collapse: collapse; margin-top: 1rem; width: 100%; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: right; }
+    th { background-color: #f2f2f2; }
+  </style>
+</head>
+<body>
+
+  <h1>Auxiliador de AR</h1>
+
+  <label>Kilometragem Inicial:
+    <input type="number" id="kmInicial" step="0.001">
+  </label>
+
+  <label>Kilometragem Final:
+    <input type="number" id="kmFinal" step="0.001">
+  </label>
+
+  <button onclick="filtrar()">Calcular</button>
+
+  <table id="resultado"></table>
+
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <script>
+    let dados = [];
+
+    // Carrega o CSV ao iniciar
+    Papa.parse("auxAR.csv", {
+      download: true,
+      header: true,
+      complete: function(results) {
+        dados = results.data;
+      }
+    });
+
+    function filtrar() {
+      const kmInicial = parseFloat(document.getElementById("kmInicial").value);
+      const kmFinal = parseFloat(document.getElementById("kmFinal").value);
+
+      const filtrado = dados.filter(row => {
+        const km = parseFloat(row["KM"]);
+        return km >= kmInicial && km <= kmFinal;
+      });
+
+      exibirTabela(filtrado);
+    }
+
+    function exibirTabela(data) {
+      const tabela = document.getElementById("resultado");
+      tabela.innerHTML = "";
+
+      if (data.length === 0) {
+        tabela.innerHTML = "<tr><td>Nenhum resultado encontrado</td></tr>";
+        return;
+      }
+
+      // Cabeçalho
+      const cabecalho = Object.keys(data[0]);
+      let thead = "<tr>" + cabecalho.map(col => `<th>${col}</th>`).join("") + "</tr>";
+      tabela.innerHTML += thead;
+
+      // Dados
+      data.forEach(row => {
+        let linha = "<tr>" + cabecalho.map(col => `<td>${row[col]}</td>`).join("") + "</tr>";
+        tabela.innerHTML += linha;
+      });
+    }
+  </script>
+</body>
+</html> -->
+
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Auxiliador de AR</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <div class="container">
+    <h1>Auxiliador de AR</h1>
+
+    <div class="input-group">
+      <label for="kmInicial">Km Inicial:</label>
+      <input type="number" id="kmInicial" step="0.100" />
+    </div>
+
+    <div class="input-group">
+      <label for="kmFinal">Km Final:</label>
+      <input type="number" id="kmFinal" step="0.100" />
+    </div>
+
+    <button onclick="filtrar()">Calcular</button>
+
+    <div class="table-container">
+      <table id="resultado"></table>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
