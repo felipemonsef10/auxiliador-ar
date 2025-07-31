@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Auxiliador de AR</title>
+  <style>
+    /* Conteúdo do style.css embutido */
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f8f9fa;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 800px;
+      margin: 2rem 1rem;
+      padding: 2rem;
+      background-color: #ffffff;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+      border-radius: 12px;
+    }
+
+    h1 {
+      text-align: center;
+      margin-top: 0;
+      margin-bottom: 2rem;
+      color: #333;
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 1.5rem;
+    }
+
+    label {
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: #444;
+    }
+
+    input[type="number"] {
+      padding: 0.75rem;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    input[type="number"]:focus {
+        outline: none;
+        border-color: #007bff;
+        box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+    }
+
+    button {
+      display: block;
+      width: 100%;
+      padding: 0.8rem;
+      margin-top: 1rem;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      font-size: 1.1rem;
+      font-weight: bold;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.1s;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    button:active {
+        transform: scale(0.99);
+    }
+
+    .table-container {
+      overflow-x: auto;
+      margin-top: 2.5rem;
+      border: 1px solid #dee2e6;
+      border-radius: 8px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      padding: 0.85rem 1rem;
+      border-bottom: 1px solid #dee2e6;
+      text-align: left;
+    }
+    
+    td:first-child, th:first-child {
+        text-align: right;
+        font-weight: 500;
+    }
+
+    tr:last-child td {
+        border-bottom: none;
+    }
+
+    th {
+      background-color: #f1f1f1;
+      color: #333;
+      font-weight: 700;
+    }
+    
+    #status-message {
+        text-align: center;
+        padding: 2rem;
+        color: #6c757d;
+        background-color: #fdfdfe;
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        padding: 1.5rem;
+        margin: 1rem;
+      }
+
+      th, td {
+        font-size: 0.9rem;
+        padding: 0.6rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>Auxiliador de AR</h1>
+
+    <div class="input-group">
+      <label for="kmInicial">Km Inicial:</label>
+      <input type="number" id="kmInicial" step="0.100" placeholder="Ex: 4.2" />
+    </div>
+
+    <div class="input-group">
+      <label for="kmFinal">Km Final:</label>
+      <input type="number" id="kmFinal" step="0.100" placeholder="Ex: 10" />
+    </div>
+
+    <button onclick="filtrar()">Calcular</button>
+
+    <div class="table-container">
+      <table id="resultado">
+          <thead></thead>
+          <tbody>
+              <tr>
+                  <td id="status-message" colspan="2">Insira um intervalo de quilometragem e clique em "Calcular".</td>
+              </tr>
+          </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    // Conteúdo do script.js e dados do auxAR.csv embutidos
+
+    // 1. DADOS DO CSV
+    // Os dados foram extraídos do arquivo auxAR.csv e colocados diretamente aqui.
+    const dados = [
+        { "KM": 4.2, "Restrição": "PN" },
+        { "KM": 7, "Restrição": "BUEIRO - RISCO DE BUEIRO ABERTO" },
+        { "KM": 8, "Restrição": "TUNEL" },
+        { "KM": 9, "Restrição": "TUNEL" },
+        { "KM": 10, "Restrição": "VIADULTO - NÃO DEVE FAZER REVISTA DEVIDO AO RISCO DE QUEDA" },
+        { "KM": 11, "Restrição": "TUNEL" },
+        { "KM": 12, "Restrição": "VIADULTO - NÃO DEVE FAZER REVISTA DEVIDO AO RISCO DE QUEDA" },
+        { "KM": 13, "Restrição": "TUNEL" },
+        { "KM": 17, "Restrição": "TUNEL" },
+        { "KM": 19, "Restrição": "SEMAFORO" },
+        { "KM": 20, "Restrição": "SEMAFORO" },
+        { "KM": 28, "Restrição": "PASSAGEM INFERIOR" },
+        { "KM": 30, "Restrição": "TUNEL" },
+        { "KM": 33, "Restrição": "PONTE - NÃO DEVE FAZER REVISTA DEVIDO AO RISCO DE QUEDA" },
+        { "KM": 37, "Restrição": "CORTE" },
+        { "KM": 39, "Restrição": "PN" },
+        { "KM": 61, "Restrição": "CORTE" },
+        { "KM": 70, "Restrição": "SEMAFORO" },
+        { "KM": 72, "Restrição": "SEMAFORO" },
+        { "KM": 94, "Restrição": "PONTE - NÃO DEVE FAZER REVISTA DEVIDO AO RISCO DE QUEDA" },
+        { "KM": 98, "Restrição": "SEMAFORO" },
+        { "KM": 99, "Restrição": "SEMAFORO" },
+        { "KM": 119, "Restrição": "SEMAFORO" },
+        { "KM": 120, "Restrição": "ZONA QUENTE" },
+        { "KM": 121, "Restrição": "ZONA QUENTE" }
+    ];
+
+    // 2. FUNÇÕES DO APLICATIVO
+
+    /**
+     * Filtra os dados com base no intervalo de KM inserido pelo usuário.
+     */
+    function filtrar() {
+      const kmInicialInput = document.getElementById("kmInicial");
+      const kmFinalInput = document.getElementById("kmFinal");
+      
+      // Remove a validação visual de erro, se houver
+      kmInicialInput.style.borderColor = '#ccc';
+      kmFinalInput.style.borderColor = '#ccc';
+
+      const kmInicial = parseFloat(kmInicialInput.value);
+      const kmFinal = parseFloat(kmFinalInput.value);
+
+      if (isNaN(kmInicial) || isNaN(kmFinal)) {
+        exibirTabela([], 'Por favor, preencha ambos os campos de quilometragem corretamente.');
+        if(isNaN(kmInicial)) kmInicialInput.style.borderColor = 'red';
+        if(isNaN(kmFinal)) kmFinalInput.style.borderColor = 'red';
+        return;
+      }
+      
+      if (kmInicial > kmFinal) {
+        exibirTabela([], 'A quilometragem inicial não pode ser maior que a final.');
+        kmInicialInput.style.borderColor = 'red';
+        kmFinalInput.style.borderColor = 'red';
+        return;
+      }
+
+      const filtrado = dados.filter(row => {
+        const km = row["KM"]; // Os KMs já são números no nosso array
+        return !isNaN(km) && km >= kmInicial && km <= kmFinal;
+      });
+
+      exibirTabela(filtrado, 'Nenhum resultado encontrado para este intervalo.');
+    }
+
+    /**
+     * Exibe os dados filtrados na tabela HTML.
+     * @param {Array} data - O array de dados a ser exibido.
+     * @param {string} emptyMessage - A mensagem a ser exibida se não houver dados.
+     */
+    function exibirTabela(data, emptyMessage) {
+      const tabela = document.getElementById("resultado");
+      const thead = tabela.querySelector('thead');
+      const tbody = tabela.querySelector('tbody');
+      
+      // Limpa o conteúdo anterior
+      thead.innerHTML = "";
+      tbody.innerHTML = "";
+
+      if (data.length === 0) {
+        tbody.innerHTML = `<tr><td id="status-message" colspan="2">${emptyMessage}</td></tr>`;
+        return;
+      }
+
+      // Cria o cabeçalho da tabela dinamicamente
+      const cabecalho = Object.keys(data[0]);
+      thead.innerHTML = "<tr>" + cabecalho.map(col => `<th>${col}</th>`).join("") + "</tr>";
+
+      // Preenche as linhas da tabela com os dados
+      data.forEach(row => {
+        let linha = "<tr>" + cabecalho.map(col => `<td>${row[col]}</td>`).join("") + "</tr>";
+        tbody.innerHTML += linha;
+      });
+    }
+  </script>
+</body>
+</html>
