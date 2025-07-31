@@ -3,12 +3,32 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <!-- Meta tags para experiência de App Mobile (PWA) -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="application-name" content="Aux. AR">
+  <meta name="apple-mobile-web-app-title" content="Aux. AR">
+  <meta name="theme-color" content="#007bff">
+  <meta name="msapplication-navbutton-color" content="#007bff">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="msapplication-starturl" content="/">
+
   <title>Auxiliador de AR</title>
   <style>
     /* Conteúdo do style.css embutido */
+    :root {
+        --primary-color: #007bff;
+        --background-color: #f8f9fa;
+        --surface-color: #ffffff;
+        --text-color: #212529;
+        --border-color: #dee2e6;
+        --error-color: #dc3545;
+    }
+    
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #f8f9fa;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--background-color);
       margin: 0;
       padding: 0;
       display: flex;
@@ -20,10 +40,10 @@
     .container {
       width: 100%;
       max-width: 800px;
-      margin: 2rem 1rem;
+      margin: 1rem;
       padding: 2rem;
-      background-color: #ffffff;
-      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+      background-color: var(--surface-color);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
       border-radius: 12px;
     }
 
@@ -47,25 +67,32 @@
     }
 
     input[type="number"] {
-      padding: 0.75rem;
+      -webkit-appearance: none;
+      -moz-appearance: textfield;
+      appearance: none;
+      padding: 0.85rem;
       font-size: 1rem;
-      border: 1px solid #ccc;
+      border: 1px solid var(--border-color);
       border-radius: 8px;
       transition: border-color 0.2s, box-shadow 0.2s;
     }
 
     input[type="number"]:focus {
         outline: none;
-        border-color: #007bff;
+        border-color: var(--primary-color);
         box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+    }
+    
+    input.error {
+        border-color: var(--error-color);
     }
 
     button {
       display: block;
       width: 100%;
-      padding: 0.8rem;
+      padding: 0.9rem;
       margin-top: 1rem;
-      background-color: #007bff;
+      background-color: var(--primary-color);
       color: white;
       border: none;
       font-size: 1.1rem;
@@ -86,7 +113,7 @@
     .table-container {
       overflow-x: auto;
       margin-top: 2.5rem;
-      border: 1px solid #dee2e6;
+      border: 1px solid var(--border-color);
       border-radius: 8px;
     }
 
@@ -97,8 +124,9 @@
 
     th, td {
       padding: 0.85rem 1rem;
-      border-bottom: 1px solid #dee2e6;
+      border-bottom: 1px solid var(--border-color);
       text-align: left;
+      white-space: nowrap;
     }
     
     td:first-child, th:first-child {
@@ -121,17 +149,16 @@
         padding: 2rem;
         color: #6c757d;
         background-color: #fdfdfe;
+        white-space: normal;
     }
 
     @media (max-width: 600px) {
       .container {
         padding: 1.5rem;
-        margin: 1rem;
-      }
-
-      th, td {
-        font-size: 0.9rem;
-        padding: 0.6rem;
+        margin: 0;
+        border-radius: 0;
+        box-shadow: none;
+        min-height: calc(100vh - 3rem);
       }
     }
   </style>
@@ -143,12 +170,12 @@
 
     <div class="input-group">
       <label for="kmInicial">Km Inicial:</label>
-      <input type="number" id="kmInicial" step="0.100" placeholder="Ex: 4.2" />
+      <input type="number" id="kmInicial" step="0.100" placeholder="Ex: 4.2" inputmode="decimal" />
     </div>
 
     <div class="input-group">
       <label for="kmFinal">Km Final:</label>
-      <input type="number" id="kmFinal" step="0.100" placeholder="Ex: 10" />
+      <input type="number" id="kmFinal" step="0.100" placeholder="Ex: 10" inputmode="decimal" />
     </div>
 
     <button onclick="filtrar()">Calcular</button>
@@ -158,7 +185,7 @@
           <thead></thead>
           <tbody>
               <tr>
-                  <td id="status-message" colspan="2">Insira um intervalo de quilometragem e clique em "Calcular".</td>
+                  <td id="status-message" colspan="2">Insira um intervalo e clique em "Calcular".</td>
               </tr>
           </tbody>
       </table>
@@ -166,10 +193,11 @@
   </div>
 
   <script>
-    // Conteúdo do script.js e dados do auxAR.csv embutidos
+    // =================================================================================
+    // LÓGICA DO APLICATIVO
+    // =================================================================================
 
-    // 1. DADOS DO CSV
-    // Os dados foram extraídos do arquivo auxAR.csv e colocados diretamente aqui.
+    // 1. DADOS DO CSV EMBUTIDOS
     const dados = [
         { "KM": 4.2, "Restrição": "PN" },
         { "KM": 7, "Restrição": "BUEIRO - RISCO DE BUEIRO ABERTO" },
@@ -199,54 +227,43 @@
     ];
 
     // 2. FUNÇÕES DO APLICATIVO
-
-    /**
-     * Filtra os dados com base no intervalo de KM inserido pelo usuário.
-     */
     function filtrar() {
       const kmInicialInput = document.getElementById("kmInicial");
       const kmFinalInput = document.getElementById("kmFinal");
       
-      // Remove a validação visual de erro, se houver
-      kmInicialInput.style.borderColor = '#ccc';
-      kmFinalInput.style.borderColor = '#ccc';
+      kmInicialInput.classList.remove('error');
+      kmFinalInput.classList.remove('error');
 
       const kmInicial = parseFloat(kmInicialInput.value);
       const kmFinal = parseFloat(kmFinalInput.value);
 
       if (isNaN(kmInicial) || isNaN(kmFinal)) {
         exibirTabela([], 'Por favor, preencha ambos os campos de quilometragem corretamente.');
-        if(isNaN(kmInicial)) kmInicialInput.style.borderColor = 'red';
-        if(isNaN(kmFinal)) kmFinalInput.style.borderColor = 'red';
+        if(isNaN(kmInicial)) kmInicialInput.classList.add('error');
+        if(isNaN(kmFinal)) kmFinalInput.classList.add('error');
         return;
       }
       
       if (kmInicial > kmFinal) {
         exibirTabela([], 'A quilometragem inicial não pode ser maior que a final.');
-        kmInicialInput.style.borderColor = 'red';
-        kmFinalInput.style.borderColor = 'red';
+        kmInicialInput.classList.add('error');
+        kmFinalInput.classList.add('error');
         return;
       }
 
       const filtrado = dados.filter(row => {
-        const km = row["KM"]; // Os KMs já são números no nosso array
+        const km = row["KM"];
         return !isNaN(km) && km >= kmInicial && km <= kmFinal;
       });
 
       exibirTabela(filtrado, 'Nenhum resultado encontrado para este intervalo.');
     }
 
-    /**
-     * Exibe os dados filtrados na tabela HTML.
-     * @param {Array} data - O array de dados a ser exibido.
-     * @param {string} emptyMessage - A mensagem a ser exibida se não houver dados.
-     */
     function exibirTabela(data, emptyMessage) {
       const tabela = document.getElementById("resultado");
       const thead = tabela.querySelector('thead');
       const tbody = tabela.querySelector('tbody');
       
-      // Limpa o conteúdo anterior
       thead.innerHTML = "";
       tbody.innerHTML = "";
 
@@ -255,16 +272,93 @@
         return;
       }
 
-      // Cria o cabeçalho da tabela dinamicamente
       const cabecalho = Object.keys(data[0]);
       thead.innerHTML = "<tr>" + cabecalho.map(col => `<th>${col}</th>`).join("") + "</tr>";
 
-      // Preenche as linhas da tabela com os dados
       data.forEach(row => {
         let linha = "<tr>" + cabecalho.map(col => `<td>${row[col]}</td>`).join("") + "</tr>";
         tbody.innerHTML += linha;
       });
     }
+
+    // =================================================================================
+    // LÓGICA PARA PROGRESSIVE WEB APP (PWA) OFFLINE
+    // =================================================================================
+    
+    // Gera o conteúdo do Service Worker dinamicamente
+    const swContent = `
+        const CACHE_NAME = 'aux-ar-cache-v1';
+        // A URL a ser cacheada é a própria página que iniciou o service worker.
+        // self.location.pathname garante que funcione mesmo se o nome do arquivo mudar.
+        const urlsToCache = [self.location.pathname];
+
+        self.addEventListener('install', event => {
+            event.waitUntil(
+                caches.open(CACHE_NAME)
+                    .then(cache => {
+                        console.log('Cache aberto');
+                        return cache.addAll(urlsToCache);
+                    })
+            );
+        });
+
+        self.addEventListener('fetch', event => {
+            event.respondWith(
+                caches.match(event.request)
+                    .then(response => {
+                        // Se encontrar no cache, retorna. Senão, tenta buscar na rede.
+                        return response || fetch(event.request);
+                    })
+            );
+        });
+    `;
+
+    // Gera o conteúdo do Manifesto do App dinamicamente
+    const manifestContent = {
+        "name": "Auxiliador de AR",
+        "short_name": "Aux. AR",
+        "start_url": ".",
+        "display": "standalone",
+        "background_color": "#f8f9fa",
+        "theme_color": "#007bff",
+        "description": "Ferramenta para filtrar pontos de restrição por quilometragem.",
+        "icons": [
+            {
+              "src": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxOTIgMTkyIiB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiI+PHBhdGggZmlsbD0ibm9uZSIgZD0iTTAgMGgxOTJ2MTkySDB6Ii8+PHBhdGggZmlsbD0iIzAwN2JmZiIgZD0iTTk2IDIzYTczIDczIDAgMSAwIDAgMTQ2IDczIDczIDAgMCAwIDAtMTQ2Wm0wIDE2YTQ5LjQxIDQ5LjQxIDAgMCAxIDM1IDg0LjM5QTU3IDU3IDAgMSAxIDk2IDM5WiIvPjxwYXRoIGZpbGw9IiMwMDdiZmYiIGQ9Im0xMzEgODRhMzUgMzUgMCAxIDEgMCAxIDM1IDM1IDAgMCAxIDAtMVoiLz48L3N2Zz4=",
+              "sizes": "192x192",
+              "type": "image/svg+xml"
+            },
+            {
+              "src": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIiB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiI+PHBhdGggZmlsbD0ibm9uZSIgZD0iTTAgMGg1MTJ2NTEySDB6Ii8+PHBhdGggZmlsbD0iIzAwN2JmZiIgZD0iTTI1NiA1NkExOTIgMTkyIDAgMSAwIDQ0OCAyNDggMTkyIDE5MiAwIDAgMCAyNTYgNTZabTAgMzMyYTExNi42NSAxMTYuNjUgMCAwIDEgODIgMTk4LjQ0QTE0MCAxNDAgMCAxIDEgMjU2IDg4YTE0MCAxNDAgMCAwIDEgMCAyODBaIi8+PHBhdGggZmlsbD0iIzAwN2JmZiIgZD0ibTMzOCAxOTZhODQgODQgMCAxIDEgMCAuMjFaIi8+PC9zdmc+",
+              "sizes": "512x512",
+              "type": "image/svg+xml"
+            }
+        ]
+    };
+
+    // Função para registrar o Service Worker e o Manifesto
+    function registerPWA() {
+        // 1. Registra o Service Worker
+        if ('serviceWorker' in navigator) {
+            const swBlob = new Blob([swContent], { type: 'application/javascript' });
+            const swUrl = URL.createObjectURL(swBlob);
+            navigator.serviceWorker.register(swUrl)
+                .then(registration => console.log('Service Worker registrado com sucesso:', registration))
+                .catch(error => console.log('Falha ao registrar Service Worker:', error));
+        }
+
+        // 2. Anexa o Manifesto
+        const manifestBlob = new Blob([JSON.stringify(manifestContent)], { type: 'application/json' });
+        const manifestUrl = URL.createObjectURL(manifestBlob);
+        const linkElement = document.createElement('link');
+        linkElement.rel = 'manifest';
+        linkElement.href = manifestUrl;
+        document.head.appendChild(linkElement);
+    }
+
+    // Inicia o registro do PWA quando a página carregar
+    window.addEventListener('load', registerPWA);
+
   </script>
 </body>
 </html>
