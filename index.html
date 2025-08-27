@@ -1,31 +1,41 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
+   
   <meta charset="UTF-8" />
+   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
-  <!-- Meta tags para experiência de App Mobile (PWA) -->
+    
+   
   <meta name="mobile-web-app-capable" content="yes">
+   
   <meta name="apple-mobile-web-app-capable" content="yes">
+   
   <meta name="application-name" content="Aux. AR">
+   
   <meta name="apple-mobile-web-app-title" content="Aux. AR">
+   
   <meta name="theme-color" content="#007bff">
+   
   <meta name="msapplication-navbutton-color" content="#007bff">
+   
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+   
   <meta name="msapplication-starturl" content="/">
 
-  <title>Auxiliador de AR</title>
-  <style>
+    <title>Auxiliador de AR</title>
+    <style>
     /* Conteúdo do style.css embutido */
     :root {
-        --primary-color: #007bff;
-        --background-color: #f8f9fa;
-        --surface-color: #ffffff;
-        --text-color: #212529;
-        --border-color: #dee2e6;
-        --error-color: #dc3545;
+      --primary-color: #007bff;
+      --background-color: #f8f9fa;
+      --surface-color: #ffffff;
+      --text-color: #212529;
+      --border-color: #dee2e6;
+      --error-color: #dc3545;
     }
-    
+
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
       background-color: var(--background-color);
@@ -78,13 +88,13 @@
     }
 
     input[type="number"]:focus {
-        outline: none;
-        border-color: var(--primary-color);
-        box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
     }
-    
+
     input.error {
-        border-color: var(--error-color);
+      border-color: var(--error-color);
     }
 
     button {
@@ -107,7 +117,7 @@
     }
 
     button:active {
-        transform: scale(0.99);
+      transform: scale(0.99);
     }
 
     .table-container {
@@ -122,20 +132,22 @@
       border-collapse: collapse;
     }
 
-    th, td {
+    th,
+    td {
       padding: 0.85rem 1rem;
       border-bottom: 1px solid var(--border-color);
       text-align: left;
       white-space: nowrap;
     }
-    
-    td:first-child, th:first-child {
-        text-align: right;
-        font-weight: 500;
+
+    td:first-child,
+    th:first-child {
+      text-align: right;
+      font-weight: 500;
     }
 
     tr:last-child td {
-        border-bottom: none;
+      border-bottom: none;
     }
 
     th {
@@ -143,13 +155,37 @@
       color: #333;
       font-weight: 700;
     }
-    
+
     #status-message {
-        text-align: center;
-        padding: 2rem;
-        color: #6c757d;
-        background-color: #fdfdfe;
-        white-space: normal;
+      text-align: center;
+      padding: 2rem;
+      color: #6c757d;
+      background-color: #fdfdfe;
+      white-space: normal;
+    }
+
+    .risco-container {
+      margin-top: 1.5rem;
+      padding: 1rem;
+      background-color: var(--surface-color);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+    }
+
+    .risco-container p {
+      margin: 0 0 0.5rem;
+      font-weight: 600;
+      color: #333;
+    }
+
+    .risco-list {
+      list-style-type: disc;
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .risco-list li {
+      margin-bottom: 0.25rem;
     }
 
     @media (max-width: 600px) {
@@ -163,87 +199,531 @@
     }
   </style>
 </head>
+
 <body>
 
-  <div class="container">
-    <h1>Auxiliador de AR</h1>
+    <div class="container">
+        <h1>Auxiliador de AR</h1>
 
-    <div class="input-group">
-      <label for="kmInicial">Km Inicial:</label>
-      <input type="number" id="kmInicial" step="0.100" placeholder="Ex: 4.2" inputmode="decimal" />
+        <div class="input-group">
+            <label for="kmInicial">Km Inicial:</label>
+            <input type="number" id="kmInicial" step="0.100" placeholder="Ex: 4.2" inputmode="decimal" />
+          </div>
+
+        <div class="input-group">
+            <label for="kmFinal">Km Final:</label>
+            <input type="number" id="kmFinal" step="0.100" placeholder="Ex: 10" inputmode="decimal" />
+          </div>
+
+        <button onclick="filtrar()">Calcular</button>
+
+        <div class="table-container">
+            <table id="resultado">
+                  <thead></thead>
+                  <tbody>
+                        <tr>
+                              <td id="status-message" colspan="2">Insira um intervalo e clique em
+              "Calcular".</td>
+                          </tr>
+                    </tbody>
+              </table>
+          </div>
+
+    <div class="risco-container">
+      <p>📢 Atenção – Riscos em Trechos de Céu Aberto</p>
+      <br>
+      <p>⚡ Descarga Atmosférica</p>
+      <p>O risco de acidentes fatais por descarga atmosférica é alto em serviços realizados a céu aberto.</p>
+      <p>Em caso de dúvida sobre alertas no trecho, consulte o CCO antes de iniciar qualquer atividade.</p>
+      <br>
+      <p>🌿 Riscos ao Caminhar no Trecho</p>
+      <p>Ao longo da extensão, há risco devido a mato alto e piso irregular. Fique atento aos seguintes perigos:</p>
+      <br>
+      <p>- Quedas e tropeços: Buracos, pedras e desníveis podem estar ocultos pela vegetação.</p>
+      <p>- Contato com plantas tóxicas ou cortantes: Podem causar irritações ou ferimentos.</p>
+      <p>- Presença de animais selvagens ou peçonhentos: Podem provocar reações graves e exigir atendimento médico
+        imediato.</p>
+      <br>
+      <p>🔥 Risco de Incêndio</p>
+      <p>Durante períodos de seca, o mato alto pode facilitar a propagação de fogo, especialmente em presença de faíscas
+        ou calor gerado por equipamentos.</p>
+      <p></p>
+      <p>🚑 Emergência Médica</p>
+      <p>Em caso de necessidade, consulte o PAE no link abaixo para atendimento.</p>
+      <br>
+      <p>https://1drv.ms/b/c/0eaad9f65174ca96/EZNx0cULUzpAt4XBU0_v7r8BoQZTdrxyfbHuKPZnZDlcTA </p>
+      <br>
+      <p>Riscos identificados no trecho:</p>
+      <ul id="risco-mensagem" class="risco-list"></ul>
     </div>
-
-    <div class="input-group">
-      <label for="kmFinal">Km Final:</label>
-      <input type="number" id="kmFinal" step="0.100" placeholder="Ex: 10" inputmode="decimal" />
-    </div>
-
-    <button onclick="filtrar()">Calcular</button>
-
-    <div class="table-container">
-      <table id="resultado">
-          <thead></thead>
-          <tbody>
-              <tr>
-                  <td id="status-message" colspan="2">Insira um intervalo e clique em "Calcular".</td>
-              </tr>
-          </tbody>
-      </table>
-    </div>
+     
   </div>
 
+   
   <script>
     // =================================================================================
     // LÓGICA DO APLICATIVO
     // =================================================================================
 
-    // 1. DADOS DO CSV EMBUTIDOS
+    // 1. DADOS DO CSV EMBUTIDOS (AGORA COM A COLUNA 'RISCO')
     const dados = [
-        { "KM": 4.2, "Restrição": "PN" },
-        { "KM": 7, "Restrição": "BUEIRO - RISCO DE BUEIRO ABERTO" },
-        { "KM": 8, "Restrição": "TUNEL" },
-        { "KM": 9, "Restrição": "TUNEL" },
-        { "KM": 10, "Restrição": "VIADULTO - NÃO DEVE FAZER REVISTA DEVIDO AO RISCO DE QUEDA" },
-        { "KM": 11, "Restrição": "TUNEL" },
-        { "KM": 12, "Restrição": "VIADULTO - NÃO DEVE FAZER REVISTA DEVIDO AO RISCO DE QUEDA" },
-        { "KM": 13, "Restrição": "TUNEL" },
-        { "KM": 17, "Restrição": "TUNEL" },
-        { "KM": 19, "Restrição": "SEMAFORO" },
-        { "KM": 20, "Restrição": "SEMAFORO" },
-        { "KM": 28, "Restrição": "PASSAGEM INFERIOR" },
-        { "KM": 30, "Restrição": "TUNEL" },
-        { "KM": 33, "Restrição": "PONTE - NÃO DEVE FAZER REVISTA DEVIDO AO RISCO DE QUEDA" },
-        { "KM": 37, "Restrição": "CORTE" },
-        { "KM": 39, "Restrição": "PN" },
-        { "KM": 61, "Restrição": "CORTE" },
-        { "KM": 70, "Restrição": "SEMAFORO" },
-        { "KM": 72, "Restrição": "SEMAFORO" },
-        { "KM": 94, "Restrição": "PONTE - NÃO DEVE FAZER REVISTA DEVIDO AO RISCO DE QUEDA" },
-        { "KM": 98, "Restrição": "SEMAFORO" },
-        { "KM": 99, "Restrição": "SEMAFORO" },
-        { "KM": 119, "Restrição": "SEMAFORO" },
-        { "KM": 120, "Restrição": "ZONA QUENTE" },
-        { "KM": 121, "Restrição": "ZONA QUENTE" }
+      {
+        "KM": 4.4,
+        "Restrição": "BUEIRO",
+        "Risco": "O risco de caminhar próximo a um bueiro aberto é altíssimo:\n\n\n⚠️ Riscos Físicos e de Acidente\n- Queda: O mais óbvio e grave — uma pessoa pode cair dentro do bueiro, o que pode causar fraturas, traumatismos ou até ser fatal.\n- Torções e lesões: Mesmo sem cair totalmente, pisar em falso pode causar entorses, luxações ou cortes."
+      },
+      {
+        "KM": 4.095,
+        "Restrição": "PN",
+        "Risco": "Revistar um trem próximo a uma PN (Passagem de Nível) envolve riscos específicos que exigem atenção especial:\n\n⚠️ Riscos de Acidente\n- Trânsito de veículos e pedestres: A movimentação constante aumenta o risco de atropelamentos ou colisões durante a operação.\n- Interferência na sinalização: A presença da equipe pode confundir motoristas ou pedestres, gerando situações perigosas.\n- Movimentação do trem: Se o trem estiver em operação, há risco de partida repentina ou movimentação inesperada."
+      },
+      {
+        "KM": 5.25,
+        "Restrição": "BUEIRO",
+        "Risco": "O risco de caminhar próximo a um bueiro aberto é altíssimo:\n\n\n⚠️ Riscos Físicos e de Acidente\n- Queda: O mais óbvio e grave — uma pessoa pode cair dentro do bueiro, o que pode causar fraturas, traumatismos ou até ser fatal.\n- Torções e lesões: Mesmo sem cair totalmente, pisar em falso pode causar entorses, luxações ou cortes."
+      },
+      {
+        "KM": 5.3,
+        "Restrição": "BUEIRO",
+        "Risco": "O risco de caminhar próximo a um bueiro aberto é altíssimo:\n\n\n⚠️ Riscos Físicos e de Acidente\n- Queda: O mais óbvio e grave — uma pessoa pode cair dentro do bueiro, o que pode causar fraturas, traumatismos ou até ser fatal.\n- Torções e lesões: Mesmo sem cair totalmente, pisar em falso pode causar entorses, luxações ou cortes."
+      },
+      {
+        "KM": 6.1,
+        "Restrição": "BUEIRO",
+        "Risco": "O risco de caminhar próximo a um bueiro aberto é altíssimo:\n\n\n⚠️ Riscos Físicos e de Acidente\n- Queda: O mais óbvio e grave — uma pessoa pode cair dentro do bueiro, o que pode causar fraturas, traumatismos ou até ser fatal.\n- Torções e lesões: Mesmo sem cair totalmente, pisar em falso pode causar entorses, luxações ou cortes."
+      },
+      {
+        "KM": 6.5,
+        "Restrição": "BUEIRO",
+        "Risco": "O risco de caminhar próximo a um bueiro aberto é altíssimo:\n\n\n⚠️ Riscos Físicos e de Acidente\n- Queda: O mais óbvio e grave — uma pessoa pode cair dentro do bueiro, o que pode causar fraturas, traumatismos ou até ser fatal.\n- Torções e lesões: Mesmo sem cair totalmente, pisar em falso pode causar entorses, luxações ou cortes."
+      },
+      {
+        "KM": 7.5,
+        "Restrição": "BUEIRO",
+        "Risco": "O risco de caminhar próximo a um bueiro aberto é altíssimo:\n\n\n⚠️ Riscos Físicos e de Acidente\n- Queda: O mais óbvio e grave — uma pessoa pode cair dentro do bueiro, o que pode causar fraturas, traumatismos ou até ser fatal.\n- Torções e lesões: Mesmo sem cair totalmente, pisar em falso pode causar entorses, luxações ou cortes."
+      },
+      {
+        "KM": 7.7,
+        "Restrição": "BUEIRO",
+        "Risco": "O risco de caminhar próximo a um bueiro aberto é altíssimo:\n\n\n⚠️ Riscos Físicos e de Acidente\n- Queda: O mais óbvio e grave — uma pessoa pode cair dentro do bueiro, o que pode causar fraturas, traumatismos ou até ser fatal.\n- Torções e lesões: Mesmo sem cair totalmente, pisar em falso pode causar entorses, luxações ou cortes."
+      },
+      {
+        "KM": 7.85,
+        "Restrição": "BUEIRO",
+        "Risco": "O risco de caminhar próximo a um bueiro aberto é altíssimo:\n\n\n⚠️ Riscos Físicos e de Acidente\n- Queda: O mais óbvio e grave — uma pessoa pode cair dentro do bueiro, o que pode causar fraturas, traumatismos ou até ser fatal.\n- Torções e lesões: Mesmo sem cair totalmente, pisar em falso pode causar entorses, luxações ou cortes."
+      },
+      {
+        "KM": 8.32,
+        "Restrição": "BUEIRO",
+        "Risco": "O risco de caminhar próximo a um bueiro aberto é altíssimo:\n\n\n⚠️ Riscos Físicos e de Acidente\n- Queda: O mais óbvio e grave — uma pessoa pode cair dentro do bueiro, o que pode causar fraturas, traumatismos ou até ser fatal.\n- Torções e lesões: Mesmo sem cair totalmente, pisar em falso pode causar entorses, luxações ou cortes."
+      },
+      {
+        "KM": 8.062,
+        "Restrição": "TUNEL extensao = 260.0",
+        "Risco": "Os riscos de caminhar dentro de um túnel envolve riscos significativos que exigem atenção redobrada:\n\n🌫️ Riscos Ambientais\n- Baixa ventilação: Pode haver acúmulo de gases tóxicos ou inflamáveis. \n- Pouca iluminação: A visibilidade limitada dificulta a inspeção visual e aumenta o risco de acidentes ou falhas na revista.\n\n⚠️ Riscos de Acidente\n- Espaço confinado: Túnel é considerado ambiente confinado, o que dificulta a evacuação em caso de emergência.\n- Ruído amplificado: Sons reverberam, dificultando a comunicação entre a equipe e a percepção de riscos externos.\n- Trânsito ferroviário: Se o túnel estiver em operação, há risco de aproximação de trens. \n\n🧱 Riscos Estruturais\n- Desprendimento de materiais: Estruturas antigas ou mal conservadas podem ter partes soltas, aumentando o risco de queda de objetos.\n- Infiltrações e piso escorregadio: Umidade pode causar escorregões ou dificultar a movimentação segura.\n\n\n- Presença de animais peçonhentos: Risco de animais peçonhentos e selvagens."
+      },
+      {
+        "KM": 10.002,
+        "Restrição": "PONTE",
+        "Risco": "Os riscos de caninhar ou revistar um trem sobre uma ponte envolve riscos críticos que exigem planejamento rigoroso e medidas de segurança reforçada:\n\n⚠️ Riscos de Acidente\n- Altura elevada: Quedas podem ser fatais. A ausência de guarda-corpos ou barreiras laterais aumenta o risco.\n- Espaço limitado para circulação: Pontes ferroviárias geralmente têm passagens estreitas, dificultando a movimentação segura da equipe.\n- Ausência de rota de fuga: Em caso de emergência ou aproximação de um trem, pode não haver espaço ou tempo suficiente para evacuação. \n\n🌬️ Riscos Ambientais\n- Vento forte: Em áreas elevadas ou abertas, rajadas de vento podem desequilibrar quem está caminhando ou revistando.\n- Condições climáticas adversas: Chuva, neblina ou piso molhado aumentam o risco de escorregões e dificultam a visibilidade. \n\n- Vibração da estrutura: A passagem do trem pode causar instabilidade na ponte, dificultando a inspeção e aumentando o risco de queda de objetos ou pessoas.\n\n🧱 Riscos Estruturais\n- Estrutura escorregadia: Trilhos e passarelas metálicas podem ser escorregadias, especialmente com umidade.\n- Desgaste ou corrosão: Pontes antigas podem apresentar falhas estruturais que comprometem a segurança da operação."
+      },
+      {
+        "KM": 11.0,
+        "Restrição": "TUNEL extensao = 555.0",
+        "Risco": "Os riscos de caminhar dentro de um túnel envolve riscos significativos que exigem atenção redobrada:\n\n🌫️ Riscos Ambientais\n- Baixa ventilação: Pode haver acúmulo de gases tóxicos ou inflamáveis. \n- Pouca iluminação: A visibilidade limitada dificulta a inspeção visual e aumenta o risco de acidentes ou falhas na revista.\n\n⚠️ Riscos de Acidente\n- Espaço confinado: Túnel é considerado ambiente confinado, o que dificulta a evacuação em caso de emergência.\n- Ruído amplificado: Sons reverberam, dificultando a comunicação entre a equipe e a percepção de riscos externos.\n- Trânsito ferroviário: Se o túnel estiver em operação, há risco de aproximação de trens. \n\n🧱 Riscos Estruturais\n- Desprendimento de materiais: Estruturas antigas ou mal conservadas podem ter partes soltas, aumentando o risco de queda de objetos.\n- Infiltrações e piso escorregadio: Umidade pode causar escorregões ou dificultar a movimentação segura.\n\n\n- Presença de animais peçonhentos: Risco de animais peçonhentos e selvagens."
+      },
+      {
+        "KM": 11.875,
+        "Restrição": "PONTE",
+        "Risco": "Os riscos de caninhar ou revistar um trem sobre uma ponte envolve riscos críticos que exigem planejamento rigoroso e medidas de segurança reforçada:\n\n⚠️ Riscos de Acidente\n- Altura elevada: Quedas podem ser fatais. A ausência de guarda-corpos ou barreiras laterais aumenta o risco.\n- Espaço limitado para circulação: Pontes ferroviárias geralmente têm passagens estreitas, dificultando a movimentação segura da equipe.\n- Ausência de rota de fuga: Em caso de emergência ou aproximação de um trem, pode não haver espaço ou tempo suficiente para evacuação. \n\n🌬️ Riscos Ambientais\n- Vento forte: Em áreas elevadas ou abertas, rajadas de vento podem desequilibrar quem está caminhando ou revistando.\n- Condições climáticas adversas: Chuva, neblina ou piso molhado aumentam o risco de escorregões e dificultam a visibilidade. \n\n- Vibração da estrutura: A passagem do trem pode causar instabilidade na ponte, dificultando a inspeção e aumentando o risco de queda de objetos ou pessoas.\n\n🧱 Riscos Estruturais\n- Estrutura escorregadia: Trilhos e passarelas metálicas podem ser escorregadias, especialmente com umidade.\n- Desgaste ou corrosão: Pontes antigas podem apresentar falhas estruturais que comprometem a segurança da operação."
+      },
+      {
+        "KM": 13.006,
+        "Restrição": "PONTE",
+        "Risco": "Os riscos de caninhar ou revistar um trem sobre uma ponte envolve riscos críticos que exigem planejamento rigoroso e medidas de segurança reforçada:\n\n⚠️ Riscos de Acidente\n- Altura elevada: Quedas podem ser fatais. A ausência de guarda-corpos ou barreiras laterais aumenta o risco.\n- Espaço limitado para circulação: Pontes ferroviárias geralmente têm passagens estreitas, dificultando a movimentação segura da equipe.\n- Ausência de rota de fuga: Em caso de emergência ou aproximação de um trem, pode não haver espaço ou tempo suficiente para evacuação. \n\n🌬️ Riscos Ambientais\n- Vento forte: Em áreas elevadas ou abertas, rajadas de vento podem desequilibrar quem está caminhando ou revistando.\n- Condições climáticas adversas: Chuva, neblina ou piso molhado aumentam o risco de escorregões e dificultam a visibilidade. \n\n- Vibração da estrutura: A passagem do trem pode causar instabilidade na ponte, dificultando a inspeção e aumentando o risco de queda de objetos ou pessoas.\n\n🧱 Riscos Estruturais\n- Estrutura escorregadia: Trilhos e passarelas metálicas podem ser escorregadias, especialmente com umidade.\n- Desgaste ou corrosão: Pontes antigas podem apresentar falhas estruturais que comprometem a segurança da operação."
+      },
+      {
+        "KM": 13.65,
+        "Restrição": "BUEIRO",
+        "Risco": "O risco de caminhar próximo a um bueiro aberto é altíssimo:\n\n\n⚠️ Riscos Físicos e de Acidente\n- Queda: O mais óbvio e grave — uma pessoa pode cair dentro do bueiro, o que pode causar fraturas, traumatismos ou até ser fatal.\n- Torções e lesões: Mesmo sem cair totalmente, pisar em falso pode causar entorses, luxações ou cortes."
+      },
+      {
+        "KM": 13.9,
+        "Restrição": "BUEIRO",
+        "Risco": "O risco de caminhar próximo a um bueiro aberto é altíssimo:\n\n\n⚠️ Riscos Físicos e de Acidente\n- Queda: O mais óbvio e grave — uma pessoa pode cair dentro do bueiro, o que pode causar fraturas, traumatismos ou até ser fatal.\n- Torções e lesões: Mesmo sem cair totalmente, pisar em falso pode causar entorses, luxações ou cortes."
+      },
+      {
+        "KM": 14.27,
+        "Restrição": "BUEIRO",
+        "Risco": "O risco de caminhar próximo a um bueiro aberto é altíssimo:\n\n\n⚠️ Riscos Físicos e de Acidente\n- Queda: O mais óbvio e grave — uma pessoa pode cair dentro do bueiro, o que pode causar fraturas, traumatismos ou até ser fatal.\n- Torções e lesões: Mesmo sem cair totalmente, pisar em falso pode causar entorses, luxações ou cortes."
+      },
+      {
+        "KM": 16.65,
+        "Restrição": "BUEIRO",
+        "Risco": "O risco de caminhar próximo a um bueiro aberto é altíssimo:\n\n\n⚠️ Riscos Físicos e de Acidente\n- Queda: O mais óbvio e grave — uma pessoa pode cair dentro do bueiro, o que pode causar fraturas, traumatismos ou até ser fatal.\n- Torções e lesões: Mesmo sem cair totalmente, pisar em falso pode causar entorses, luxações ou cortes."
+      },
+      {
+        "KM": 17.04,
+        "Restrição": "BUEIRO",
+        "Risco": "O risco de caminhar próximo a um bueiro aberto é altíssimo:\n\n\n⚠️ Riscos Físicos e de Acidente\n- Queda: O mais óbvio e grave — uma pessoa pode cair dentro do bueiro, o que pode causar fraturas, traumatismos ou até ser fatal.\n- Torções e lesões: Mesmo sem cair totalmente, pisar em falso pode causar entorses, luxações ou cortes."
+      },
+      {
+        "KM": 17.12,
+        "Restrição": "BUEIRO",
+        "Risco": "O risco de caminhar próximo a um bueiro aberto é altíssimo:\n\n\n⚠️ Riscos Físicos e de Acidente\n- Queda: O mais óbvio e grave — uma pessoa pode cair dentro do bueiro, o que pode causar fraturas, traumatismos ou até ser fatal.\n- Torções e lesões: Mesmo sem cair totalmente, pisar em falso pode causar entorses, luxações ou cortes."
+      },
+      {
+        "KM": 17.4,
+        "Restrição": "BUEIRO",
+        "Risco": "O risco de caminhar próximo a um bueiro aberto é altíssimo:\n\n\n⚠️ Riscos Físicos e de Acidente\n- Queda: O mais óbvio e grave — uma pessoa pode cair dentro do bueiro, o que pode causar fraturas, traumatismos ou até ser fatal.\n- Torções e lesões: Mesmo sem cair totalmente, pisar em falso pode causar entorses, luxações ou cortes."
+      },
+      {
+        "KM": 17.045,
+        "Restrição": "TUNEL extensao = 650.0",
+        "Risco": "Os riscos de caminhar dentro de um túnel envolve riscos significativos que exigem atenção redobrada:\n\n🌫️ Riscos Ambientais\n- Baixa ventilação: Pode haver acúmulo de gases tóxicos ou inflamáveis. \n- Pouca iluminação: A visibilidade limitada dificulta a inspeção visual e aumenta o risco de acidentes ou falhas na revista.\n\n⚠️ Riscos de Acidente\n- Espaço confinado: Túnel é considerado ambiente confinado, o que dificulta a evacuação em caso de emergência.\n- Ruído amplificado: Sons reverberam, dificultando a comunicação entre a equipe e a percepção de riscos externos.\n- Trânsito ferroviário: Se o túnel estiver em operação, há risco de aproximação de trens. \n\n🧱 Riscos Estruturais\n- Desprendimento de materiais: Estruturas antigas ou mal conservadas podem ter partes soltas, aumentando o risco de queda de objetos.\n- Infiltrações e piso escorregadio: Umidade pode causar escorregões ou dificultar a movimentação segura.\n\n\n- Presença de animais peçonhentos: Risco de animais peçonhentos e selvagens."
+      },
+      {
+        "KM": 18.33,
+        "Restrição": "BUEIRO",
+        "Risco": "O risco de caminhar próximo a um bueiro aberto é altíssimo:\n\n\n⚠️ Riscos Físicos e de Acidente\n- Queda: O mais óbvio e grave — uma pessoa pode cair dentro do bueiro, o que pode causar fraturas, traumatismos ou até ser fatal.\n- Torções e lesões: Mesmo sem cair totalmente, pisar em falso pode causar entorses, luxações ou cortes."
+      },
+      {
+        "KM": 18.4,
+        "Restrição": "BUEIRO",
+        "Risco": "O risco de caminhar próximo a um bueiro aberto é altíssimo:\n\n\n⚠️ Riscos Físicos e de Acidente\n- Queda: O mais óbvio e grave — uma pessoa pode cair dentro do bueiro, o que pode causar fraturas, traumatismos ou até ser fatal.\n- Torções e lesões: Mesmo sem cair totalmente, pisar em falso pode causar entorses, luxações ou cortes."
+      },
+      {
+        "KM": 19.01,
+        "Restrição": "BUEIRO",
+        "Risco": "O risco de caminhar próximo a um bueiro aberto é altíssimo:\n\n\n⚠️ Riscos Físicos e de Acidente\n- Queda: O mais óbvio e grave — uma pessoa pode cair dentro do bueiro, o que pode causar fraturas, traumatismos ou até ser fatal.\n- Torções e lesões: Mesmo sem cair totalmente, pisar em falso pode causar entorses, luxações ou cortes."
+      },
+      {
+        "KM": 19.55,
+        "Restrição": "BUEIRO",
+        "Risco": "O risco de caminhar próximo a um bueiro aberto é altíssimo:\n\n\n⚠️ Riscos Físicos e de Acidente\n- Queda: O mais óbvio e grave — uma pessoa pode cair dentro do bueiro, o que pode causar fraturas, traumatismos ou até ser fatal.\n- Torções e lesões: Mesmo sem cair totalmente, pisar em falso pode causar entorses, luxações ou cortes."
+      },
+      {
+        "KM": 19.43,
+        "Restrição": "BUEIRO",
+        "Risco": "O risco de caminhar próximo a um bueiro aberto é altíssimo:\n\n\n⚠️ Riscos Físicos e de Acidente\n- Queda: O mais óbvio e grave — uma pessoa pode cair dentro do bueiro, o que pode causar fraturas, traumatismos ou até ser fatal.\n- Torções e lesões: Mesmo sem cair totalmente, pisar em falso pode causar entorses, luxações ou cortes."
+      },
+      {
+        "KM": 19.92,
+        "Restrição": "BUEIRO",
+        "Risco": "O risco de caminhar próximo a um bueiro aberto é altíssimo:\n\n\n⚠️ Riscos Físicos e de Acidente\n- Queda: O mais óbvio e grave — uma pessoa pode cair dentro do bueiro, o que pode causar fraturas, traumatismos ou até ser fatal.\n- Torções e lesões: Mesmo sem cair totalmente, pisar em falso pode causar entorses, luxações ou cortes."
+      },
+      {
+        "KM": 20.034,
+        "Restrição": "PONTE",
+        "Risco": "Os riscos de caninhar ou revistar um trem sobre uma ponte envolve riscos críticos que exigem planejamento rigoroso e medidas de segurança reforçada:\n\n⚠️ Riscos de Acidente\n- Altura elevada: Quedas podem ser fatais. A ausência de guarda-corpos ou barreiras laterais aumenta o risco.\n- Espaço limitado para circulação: Pontes ferroviárias geralmente têm passagens estreitas, dificultando a movimentação segura da equipe.\n- Ausência de rota de fuga: Em caso de emergência ou aproximação de um trem, pode não haver espaço ou tempo suficiente para evacuação. \n\n🌬️ Riscos Ambientais\n- Vento forte: Em áreas elevadas ou abertas, rajadas de vento podem desequilibrar quem está caminhando ou revistando.\n- Condições climáticas adversas: Chuva, neblina ou piso molhado aumentam o risco de escorregões e dificultam a visibilidade. \n\n- Vibração da estrutura: A passagem do trem pode causar instabilidade na ponte, dificultando a inspeção e aumentando o risco de queda de objetos ou pessoas.\n\n🧱 Riscos Estruturais\n- Estrutura escorregadia: Trilhos e passarelas metálicas podem ser escorregadias, especialmente com umidade.\n- Desgaste ou corrosão: Pontes antigas podem apresentar falhas estruturais que comprometem a segurança da operação."
+      },
+      {
+        "KM": 21.55,
+        "Restrição": "BUEIRO",
+        "Risco": "O risco de caminhar próximo a um bueiro aberto é altíssimo:\n\n\n⚠️ Riscos Físicos e de Acidente\n- Queda: O mais óbvio e grave — uma pessoa pode cair dentro do bueiro, o que pode causar fraturas, traumatismos ou até ser fatal.\n- Torções e lesões: Mesmo sem cair totalmente, pisar em falso pode causar entorses, luxações ou cortes."
+      },
+      {
+        "KM": 21.7,
+        "Restrição": "BUEIRO",
+        "Risco": "O risco de caminhar próximo a um bueiro aberto é altíssimo:\n\n\n⚠️ Riscos Físicos e de Acidente\n- Queda: O mais óbvio e grave — uma pessoa pode cair dentro do bueiro, o que pode causar fraturas, traumatismos ou até ser fatal.\n- Torções e lesões: Mesmo sem cair totalmente, pisar em falso pode causar entorses, luxações ou cortes."
+      },
+      {
+        "KM": 21.9,
+        "Restrição": "BUEIRO",
+        "Risco": "O risco de caminhar próximo a um bueiro aberto é altíssimo:\n\n\n⚠️ Riscos Físicos e de Acidente\n- Queda: O mais óbvio e grave — uma pessoa pode cair dentro do bueiro, o que pode causar fraturas, traumatismos ou até ser fatal.\n- Torções e lesões: Mesmo sem cair totalmente, pisar em falso pode causar entorses, luxações ou cortes."
+      },
+      {
+        "KM": 23.18,
+        "Restrição": "BUEIRO",
+        "Risco": "O risco de caminhar próximo a um bueiro aberto é altíssimo:\n\n\n⚠️ Riscos Físicos e de Acidente\n- Queda: O mais óbvio e grave — uma pessoa pode cair dentro do bueiro, o que pode causar fraturas, traumatismos ou até ser fatal.\n- Torções e lesões: Mesmo sem cair totalmente, pisar em falso pode causar entorses, luxações ou cortes."
+      },
+      {
+        "KM": 23.0,
+        "Restrição": "PASSAGEM INFERIOR",
+        "Risco": "Os riscos de caminhar em local onde tem PI (Passagem inferior) deve-se ter atenção:\n\n⚠️ Riscos de Acidente\n- Quedas de altura: Se houver necessidade de acessar áreas elevadas ou bordas próximas à passagem inferior, há risco de queda.\n- Desníveis e obstáculos: O terreno pode ser irregular e ter materiais de rejeito da via permanente, que aumentam o risco de tropeços ou escorregões.\n- Colisão com veículos: Se a passagem inferior estiver sobre uma via ativa, há risco de atropelamento ou colisão com veículos em movimento."
+      },
+      {
+        "KM": 23.4,
+        "Restrição": "BUEIRO",
+        "Risco": "O risco de caminhar próximo a um bueiro aberto é altíssimo:\n\n\n⚠️ Riscos Físicos e de Acidente\n- Queda: O mais óbvio e grave — uma pessoa pode cair dentro do bueiro, o que pode causar fraturas, traumatismos ou até ser fatal.\n- Torções e lesões: Mesmo sem cair totalmente, pisar em falso pode causar entorses, luxações ou cortes."
+      },
+      {
+        "KM": 23.065,
+        "Restrição": "PONTE",
+        "Risco": "Os riscos de caninhar ou revistar um trem sobre uma ponte envolve riscos críticos que exigem planejamento rigoroso e medidas de segurança reforçada:\n\n⚠️ Riscos de Acidente\n- Altura elevada: Quedas podem ser fatais. A ausência de guarda-corpos ou barreiras laterais aumenta o risco.\n- Espaço limitado para circulação: Pontes ferroviárias geralmente têm passagens estreitas, dificultando a movimentação segura da equipe.\n- Ausência de rota de fuga: Em caso de emergência ou aproximação de um trem, pode não haver espaço ou tempo suficiente para evacuação. \n\n🌬️ Riscos Ambientais\n- Vento forte: Em áreas elevadas ou abertas, rajadas de vento podem desequilibrar quem está caminhando ou revistando.\n- Condições climáticas adversas: Chuva, neblina ou piso molhado aumentam o risco de escorregões e dificultam a visibilidade. \n\n- Vibração da estrutura: A passagem do trem pode causar instabilidade na ponte, dificultando a inspeção e aumentando o risco de queda de objetos ou pessoas.\n\n🧱 Riscos Estruturais\n- Estrutura escorregadia: Trilhos e passarelas metálicas podem ser escorregadias, especialmente com umidade.\n- Desgaste ou corrosão: Pontes antigas podem apresentar falhas estruturais que comprometem a segurança da operação."
+      },
+      {
+        "KM": 28.7,
+        "Restrição": "BUEIRO",
+        "Risco": "O risco de caminhar próximo a um bueiro aberto é altíssimo:\n\n\n⚠️ Riscos Físicos e de Acidente\n- Queda: O mais óbvio e grave — uma pessoa pode cair dentro do bueiro, o que pode causar fraturas, traumatismos ou até ser fatal.\n- Torções e lesões: Mesmo sem cair totalmente, pisar em falso pode causar entorses, luxações ou cortes."
+      },
+      {
+        "KM": 28.85,
+        "Restrição": "BUEIRO",
+        "Risco": "O risco de caminhar próximo a um bueiro aberto é altíssimo:\n\n\n⚠️ Riscos Físicos e de Acidente\n- Queda: O mais óbvio e grave — uma pessoa pode cair dentro do bueiro, o que pode causar fraturas, traumatismos ou até ser fatal.\n- Torções e lesões: Mesmo sem cair totalmente, pisar em falso pode causar entorses, luxações ou cortes."
+      },
+      {
+        "KM": 28.9,
+        "Restrição": "BUEIRO",
+        "Risco": "O risco de caminhar próximo a um bueiro aberto é altíssimo:\n\n\n⚠️ Riscos Físicos e de Acidente\n- Queda: O mais óbvio e grave — uma pessoa pode cair dentro do bueiro, o que pode causar fraturas, traumatismos ou até ser fatal.\n- Torções e lesões: Mesmo sem cair totalmente, pisar em falso pode causar entorses, luxações ou cortes."
+      },
+      {
+        "KM": 29.0,
+        "Restrição": "PASSAGEM INFERIOR",
+        "Risco": "Os riscos de caminhar em local onde tem PI (Passagem inferior) deve-se ter atenção:\n\n⚠️ Riscos de Acidente\n- Quedas de altura: Se houver necessidade de acessar áreas elevadas ou bordas próximas à passagem inferior, há risco de queda.\n- Desníveis e obstáculos: O terreno pode ser irregular e ter materiais de rejeito da via permanente, que aumentam o risco de tropeços ou escorregões.\n- Colisão com veículos: Se a passagem inferior estiver sobre uma via ativa, há risco de atropelamento ou colisão com veículos em movimento."
+      },
+      {
+        "KM": 29.52,
+        "Restrição": "BUEIRO",
+        "Risco": "O risco de caminhar próximo a um bueiro aberto é altíssimo:\n\n\n⚠️ Riscos Físicos e de Acidente\n- Queda: O mais óbvio e grave — uma pessoa pode cair dentro do bueiro, o que pode causar fraturas, traumatismos ou até ser fatal.\n- Torções e lesões: Mesmo sem cair totalmente, pisar em falso pode causar entorses, luxações ou cortes."
+      },
+      {
+        "KM": 29.8,
+        "Restrição": "BUEIRO",
+        "Risco": "O risco de caminhar próximo a um bueiro aberto é altíssimo:\n\n\n⚠️ Riscos Físicos e de Acidente\n- Queda: O mais óbvio e grave — uma pessoa pode cair dentro do bueiro, o que pode causar fraturas, traumatismos ou até ser fatal.\n- Torções e lesões: Mesmo sem cair totalmente, pisar em falso pode causar entorses, luxações ou cortes."
+      },
+      {
+        "KM": 30.15,
+        "Restrição": "BUEIRO",
+        "Risco": "O risco de caminhar próximo a um bueiro aberto é altíssimo:\n\n\n⚠️ Riscos Físicos e de Acidente\n- Queda: O mais óbvio e grave — uma pessoa pode cair dentro do bueiro, o que pode causar fraturas, traumatismos ou até ser fatal.\n- Torções e lesões: Mesmo sem cair totalmente, pisar em falso pode causar entorses, luxações ou cortes."
+      },
+      {
+        "KM": 30.36,
+        "Restrição": "BUEIRO",
+        "Risco": "O risco de caminhar próximo a um bueiro aberto é altíssimo:\n\n\n⚠️ Riscos Físicos e de Acidente\n- Queda: O mais óbvio e grave — uma pessoa pode cair dentro do bueiro, o que pode causar fraturas, traumatismos ou até ser fatal.\n- Torções e lesões: Mesmo sem cair totalmente, pisar em falso pode causar entorses, luxações ou cortes."
+      },
+      {
+        "KM": 30.061,
+        "Restrição": "TUNEL extensao = 150.0",
+        "Risco": "Os riscos de caminhar dentro de um túnel envolve riscos significativos que exigem atenção redobrada:\n\n🌫️ Riscos Ambientais\n- Baixa ventilação: Pode haver acúmulo de gases tóxicos ou inflamáveis. \n- Pouca iluminação: A visibilidade limitada dificulta a inspeção visual e aumenta o risco de acidentes ou falhas na revista.\n\n⚠️ Riscos de Acidente\n- Espaço confinado: Túnel é considerado ambiente confinado, o que dificulta a evacuação em caso de emergência.\n- Ruído amplificado: Sons reverberam, dificultando a comunicação entre a equipe e a percepção de riscos externos.\n- Trânsito ferroviário: Se o túnel estiver em operação, há risco de aproximação de trens. \n\n🧱 Riscos Estruturais\n- Desprendimento de materiais: Estruturas antigas ou mal conservadas podem ter partes soltas, aumentando o risco de queda de objetos.\n- Infiltrações e piso escorregadio: Umidade pode causar escorregões ou dificultar a movimentação segura.\n\n\n- Presença de animais peçonhentos: Risco de animais peçonhentos e selvagens."
+      },
+      {
+        "KM": 33.0,
+        "Restrição": "PONTE",
+        "Risco": "Os riscos de caninhar ou revistar um trem sobre uma ponte envolve riscos críticos que exigem planejamento rigoroso e medidas de segurança reforçada:\n\n⚠️ Riscos de Acidente\n- Altura elevada: Quedas podem ser fatais. A ausência de guarda-corpos ou barreiras laterais aumenta o risco.\n- Espaço limitado para circulação: Pontes ferroviárias geralmente têm passagens estreitas, dificultando a movimentação segura da equipe.\n- Ausência de rota de fuga: Em caso de emergência ou aproximação de um trem, pode não haver espaço ou tempo suficiente para evacuação. \n\n🌬️ Riscos Ambientais\n- Vento forte: Em áreas elevadas ou abertas, rajadas de vento podem desequilibrar quem está caminhando ou revistando.\n- Condições climáticas adversas: Chuva, neblina ou piso molhado aumentam o risco de escorregões e dificultam a visibilidade. \n\n- Vibração da estrutura: A passagem do trem pode causar instabilidade na ponte, dificultando a inspeção e aumentando o risco de queda de objetos ou pessoas.\n\n🧱 Riscos Estruturais\n- Estrutura escorregadia: Trilhos e passarelas metálicas podem ser escorregadias, especialmente com umidade.\n- Desgaste ou corrosão: Pontes antigas podem apresentar falhas estruturais que comprometem a segurança da operação."
+      },
+      {
+        "KM": 34.0,
+        "Restrição": "PASSAGEM INFERIOR",
+        "Risco": "Os riscos de caminhar em local onde tem PI (Passagem inferior) deve-se ter atenção:\n\n⚠️ Riscos de Acidente\n- Quedas de altura: Se houver necessidade de acessar áreas elevadas ou bordas próximas à passagem inferior, há risco de queda.\n- Desníveis e obstáculos: O terreno pode ser irregular e ter materiais de rejeito da via permanente, que aumentam o risco de tropeços ou escorregões.\n- Colisão com veículos: Se a passagem inferior estiver sobre uma via ativa, há risco de atropelamento ou colisão com veículos em movimento."
+      },
+      {
+        "KM": 38.098,
+        "Restrição": "PASSAGEM INFERIOR",
+        "Risco": "Os riscos de caminhar em local onde tem PI (Passagem inferior) deve-se ter atenção:\n\n⚠️ Riscos de Acidente\n- Quedas de altura: Se houver necessidade de acessar áreas elevadas ou bordas próximas à passagem inferior, há risco de queda.\n- Desníveis e obstáculos: O terreno pode ser irregular e ter materiais de rejeito da via permanente, que aumentam o risco de tropeços ou escorregões.\n- Colisão com veículos: Se a passagem inferior estiver sobre uma via ativa, há risco de atropelamento ou colisão com veículos em movimento."
+      },
+      {
+        "KM": 44.007,
+        "Restrição": "PASSAGEM INFERIOR",
+        "Risco": "Os riscos de caminhar em local onde tem PI (Passagem inferior) deve-se ter atenção:\n\n⚠️ Riscos de Acidente\n- Quedas de altura: Se houver necessidade de acessar áreas elevadas ou bordas próximas à passagem inferior, há risco de queda.\n- Desníveis e obstáculos: O terreno pode ser irregular e ter materiais de rejeito da via permanente, que aumentam o risco de tropeços ou escorregões.\n- Colisão com veículos: Se a passagem inferior estiver sobre uma via ativa, há risco de atropelamento ou colisão com veículos em movimento."
+      },
+      {
+        "KM": 46.1,
+        "Restrição": "PASSAGEM INFERIOR",
+        "Risco": "Os riscos de caminhar em local onde tem PI (Passagem inferior) deve-se ter atenção:\n\n⚠️ Riscos de Acidente\n- Quedas de altura: Se houver necessidade de acessar áreas elevadas ou bordas próximas à passagem inferior, há risco de queda.\n- Desníveis e obstáculos: O terreno pode ser irregular e ter materiais de rejeito da via permanente, que aumentam o risco de tropeços ou escorregões.\n- Colisão com veículos: Se a passagem inferior estiver sobre uma via ativa, há risco de atropelamento ou colisão com veículos em movimento."
+      },
+      {
+        "KM": 49.031,
+        "Restrição": "PONTE",
+        "Risco": "Os riscos de caninhar ou revistar um trem sobre uma ponte envolve riscos críticos que exigem planejamento rigoroso e medidas de segurança reforçada:\n\n⚠️ Riscos de Acidente\n- Altura elevada: Quedas podem ser fatais. A ausência de guarda-corpos ou barreiras laterais aumenta o risco.\n- Espaço limitado para circulação: Pontes ferroviárias geralmente têm passagens estreitas, dificultando a movimentação segura da equipe.\n- Ausência de rota de fuga: Em caso de emergência ou aproximação de um trem, pode não haver espaço ou tempo suficiente para evacuação. \n\n🌬️ Riscos Ambientais\n- Vento forte: Em áreas elevadas ou abertas, rajadas de vento podem desequilibrar quem está caminhando ou revistando.\n- Condições climáticas adversas: Chuva, neblina ou piso molhado aumentam o risco de escorregões e dificultam a visibilidade. \n\n- Vibração da estrutura: A passagem do trem pode causar instabilidade na ponte, dificultando a inspeção e aumentando o risco de queda de objetos ou pessoas.\n\n🧱 Riscos Estruturais\n- Estrutura escorregadia: Trilhos e passarelas metálicas podem ser escorregadias, especialmente com umidade.\n- Desgaste ou corrosão: Pontes antigas podem apresentar falhas estruturais que comprometem a segurança da operação."
+      },
+      {
+        "KM": 52.0,
+        "Restrição": "PN",
+        "Risco": "Revistar um trem próximo a uma PN (Passagem de Nível) envolve riscos específicos que exigem atenção especial:\n\n⚠️ Riscos de Acidente\n- Trânsito de veículos e pedestres: A movimentação constante aumenta o risco de atropelamentos ou colisões durante a operação.\n- Interferência na sinalização: A presença da equipe pode confundir motoristas ou pedestres, gerando situações perigosas.\n- Movimentação do trem: Se o trem estiver em operação, há risco de partida repentina ou movimentação inesperada."
+      },
+      {
+        "KM": 52.0,
+        "Restrição": "PASSAGEM INFERIOR",
+        "Risco": "Os riscos de caminhar em local onde tem PI (Passagem inferior) deve-se ter atenção:\n\n⚠️ Riscos de Acidente\n- Quedas de altura: Se houver necessidade de acessar áreas elevadas ou bordas próximas à passagem inferior, há risco de queda.\n- Desníveis e obstáculos: O terreno pode ser irregular e ter materiais de rejeito da via permanente, que aumentam o risco de tropeços ou escorregões.\n- Colisão com veículos: Se a passagem inferior estiver sobre uma via ativa, há risco de atropelamento ou colisão com veículos em movimento."
+      },
+      {
+        "KM": 57.3,
+        "Restrição": "PN",
+        "Risco": "Revistar um trem próximo a uma PN (Passagem de Nível) envolve riscos específicos que exigem atenção especial:\n\n⚠️ Riscos de Acidente\n- Trânsito de veículos e pedestres: A movimentação constante aumenta o risco de atropelamentos ou colisões durante a operação.\n- Interferência na sinalização: A presença da equipe pode confundir motoristas ou pedestres, gerando situações perigosas.\n- Movimentação do trem: Se o trem estiver em operação, há risco de partida repentina ou movimentação inesperada."
+      },
+      {
+        "KM": 61.52,
+        "Restrição": "PN",
+        "Risco": "Revistar um trem próximo a uma PN (Passagem de Nível) envolve riscos específicos que exigem atenção especial:\n\n⚠️ Riscos de Acidente\n- Trânsito de veículos e pedestres: A movimentação constante aumenta o risco de atropelamentos ou colisões durante a operação.\n- Interferência na sinalização: A presença da equipe pode confundir motoristas ou pedestres, gerando situações perigosas.\n- Movimentação do trem: Se o trem estiver em operação, há risco de partida repentina ou movimentação inesperada."
+      },
+      {
+        "KM": 63.22,
+        "Restrição": "PN",
+        "Risco": "Revistar um trem próximo a uma PN (Passagem de Nível) envolve riscos específicos que exigem atenção especial:\n\n⚠️ Riscos de Acidente\n- Trânsito de veículos e pedestres: A movimentação constante aumenta o risco de atropelamentos ou colisões durante a operação.\n- Interferência na sinalização: A presença da equipe pode confundir motoristas ou pedestres, gerando situações perigosas.\n- Movimentação do trem: Se o trem estiver em operação, há risco de partida repentina ou movimentação inesperada."
+      },
+      {
+        "KM": 67.06,
+        "Restrição": "PN",
+        "Risco": "Revistar um trem próximo a uma PN (Passagem de Nível) envolve riscos específicos que exigem atenção especial:\n\n⚠️ Riscos de Acidente\n- Trânsito de veículos e pedestres: A movimentação constante aumenta o risco de atropelamentos ou colisões durante a operação.\n- Interferência na sinalização: A presença da equipe pode confundir motoristas ou pedestres, gerando situações perigosas.\n- Movimentação do trem: Se o trem estiver em operação, há risco de partida repentina ou movimentação inesperada."
+      },
+      {
+        "KM": 67.6,
+        "Restrição": "PN",
+        "Risco": "Revistar um trem próximo a uma PN (Passagem de Nível) envolve riscos específicos que exigem atenção especial:\n\n⚠️ Riscos de Acidente\n- Trânsito de veículos e pedestres: A movimentação constante aumenta o risco de atropelamentos ou colisões durante a operação.\n- Interferência na sinalização: A presença da equipe pode confundir motoristas ou pedestres, gerando situações perigosas.\n- Movimentação do trem: Se o trem estiver em operação, há risco de partida repentina ou movimentação inesperada."
+      },
+      {
+        "KM": 70.0,
+        "Restrição": "BUEIRO",
+        "Risco": "O risco de caminhar próximo a um bueiro aberto é altíssimo:\n\n\n⚠️ Riscos Físicos e de Acidente\n- Queda: O mais óbvio e grave — uma pessoa pode cair dentro do bueiro, o que pode causar fraturas, traumatismos ou até ser fatal.\n- Torções e lesões: Mesmo sem cair totalmente, pisar em falso pode causar entorses, luxações ou cortes."
+      },
+      {
+        "KM": 74.98,
+        "Restrição": "PN",
+        "Risco": "Revistar um trem próximo a uma PN (Passagem de Nível) envolve riscos específicos que exigem atenção especial:\n\n⚠️ Riscos de Acidente\n- Trânsito de veículos e pedestres: A movimentação constante aumenta o risco de atropelamentos ou colisões durante a operação.\n- Interferência na sinalização: A presença da equipe pode confundir motoristas ou pedestres, gerando situações perigosas.\n- Movimentação do trem: Se o trem estiver em operação, há risco de partida repentina ou movimentação inesperada."
+      },
+      {
+        "KM": 75.0,
+        "Restrição": "PASSAGEM INFERIOR",
+        "Risco": "Os riscos de caminhar em local onde tem PI (Passagem inferior) deve-se ter atenção:\n\n⚠️ Riscos de Acidente\n- Quedas de altura: Se houver necessidade de acessar áreas elevadas ou bordas próximas à passagem inferior, há risco de queda.\n- Desníveis e obstáculos: O terreno pode ser irregular e ter materiais de rejeito da via permanente, que aumentam o risco de tropeços ou escorregões.\n- Colisão com veículos: Se a passagem inferior estiver sobre uma via ativa, há risco de atropelamento ou colisão com veículos em movimento."
+      },
+      {
+        "KM": 89.36,
+        "Restrição": "PONTE",
+        "Risco": "Os riscos de caninhar ou revistar um trem sobre uma ponte envolve riscos críticos que exigem planejamento rigoroso e medidas de segurança reforçada:\n\n⚠️ Riscos de Acidente\n- Altura elevada: Quedas podem ser fatais. A ausência de guarda-corpos ou barreiras laterais aumenta o risco.\n- Espaço limitado para circulação: Pontes ferroviárias geralmente têm passagens estreitas, dificultando a movimentação segura da equipe.\n- Ausência de rota de fuga: Em caso de emergência ou aproximação de um trem, pode não haver espaço ou tempo suficiente para evacuação. \n\n🌬️ Riscos Ambientais\n- Vento forte: Em áreas elevadas ou abertas, rajadas de vento podem desequilibrar quem está caminhando ou revistando.\n- Condições climáticas adversas: Chuva, neblina ou piso molhado aumentam o risco de escorregões e dificultam a visibilidade. \n\n- Vibração da estrutura: A passagem do trem pode causar instabilidade na ponte, dificultando a inspeção e aumentando o risco de queda de objetos ou pessoas.\n\n🧱 Riscos Estruturais\n- Estrutura escorregadia: Trilhos e passarelas metálicas podem ser escorregadias, especialmente com umidade.\n- Desgaste ou corrosão: Pontes antigas podem apresentar falhas estruturais que comprometem a segurança da operação."
+      },
+      {
+        "KM": 89.96,
+        "Restrição": "PASSAGEM INFERIOR",
+        "Risco": "Os riscos de caminhar em local onde tem PI (Passagem inferior) deve-se ter atenção:\n\n⚠️ Riscos de Acidente\n- Quedas de altura: Se houver necessidade de acessar áreas elevadas ou bordas próximas à passagem inferior, há risco de queda.\n- Desníveis e obstáculos: O terreno pode ser irregular e ter materiais de rejeito da via permanente, que aumentam o risco de tropeços ou escorregões.\n- Colisão com veículos: Se a passagem inferior estiver sobre uma via ativa, há risco de atropelamento ou colisão com veículos em movimento."
+      },
+      {
+        "KM": 93.82,
+        "Restrição": "PN",
+        "Risco": "Revistar um trem próximo a uma PN (Passagem de Nível) envolve riscos específicos que exigem atenção especial:\n\n⚠️ Riscos de Acidente\n- Trânsito de veículos e pedestres: A movimentação constante aumenta o risco de atropelamentos ou colisões durante a operação.\n- Interferência na sinalização: A presença da equipe pode confundir motoristas ou pedestres, gerando situações perigosas.\n- Movimentação do trem: Se o trem estiver em operação, há risco de partida repentina ou movimentação inesperada."
+      },
+      {
+        "KM": 92.9,
+        "Restrição": "PASSAGEM INFERIOR",
+        "Risco": "Os riscos de caminhar em local onde tem PI (Passagem inferior) deve-se ter atenção:\n\n⚠️ Riscos de Acidente\n- Quedas de altura: Se houver necessidade de acessar áreas elevadas ou bordas próximas à passagem inferior, há risco de queda.\n- Desníveis e obstáculos: O terreno pode ser irregular e ter materiais de rejeito da via permanente, que aumentam o risco de tropeços ou escorregões.\n- Colisão com veículos: Se a passagem inferior estiver sobre uma via ativa, há risco de atropelamento ou colisão com veículos em movimento."
+      },
+      {
+        "KM": 92.81,
+        "Restrição": "PONTE",
+        "Risco": "Os riscos de caninhar ou revistar um trem sobre uma ponte envolve riscos críticos que exigem planejamento rigoroso e medidas de segurança reforçada:\n\n⚠️ Riscos de Acidente\n- Altura elevada: Quedas podem ser fatais. A ausência de guarda-corpos ou barreiras laterais aumenta o risco.\n- Espaço limitado para circulação: Pontes ferroviárias geralmente têm passagens estreitas, dificultando a movimentação segura da equipe.\n- Ausência de rota de fuga: Em caso de emergência ou aproximação de um trem, pode não haver espaço ou tempo suficiente para evacuação. \n\n🌬️ Riscos Ambientais\n- Vento forte: Em áreas elevadas ou abertas, rajadas de vento podem desequilibrar quem está caminhando ou revistando.\n- Condições climáticas adversas: Chuva, neblina ou piso molhado aumentam o risco de escorregões e dificultam a visibilidade. \n\n- Vibração da estrutura: A passagem do trem pode causar instabilidade na ponte, dificultando a inspeção e aumentando o risco de queda de objetos ou pessoas.\n\n🧱 Riscos Estruturais\n- Estrutura escorregadia: Trilhos e passarelas metálicas podem ser escorregadias, especialmente com umidade.\n- Desgaste ou corrosão: Pontes antigas podem apresentar falhas estruturais que comprometem a segurança da operação."
+      },
+      {
+        "KM": 98.2,
+        "Restrição": "PN",
+        "Risco": "Revistar um trem próximo a uma PN (Passagem de Nível) envolve riscos específicos que exigem atenção especial:\n\n⚠️ Riscos de Acidente\n- Trânsito de veículos e pedestres: A movimentação constante aumenta o risco de atropelamentos ou colisões durante a operação.\n- Interferência na sinalização: A presença da equipe pode confundir motoristas ou pedestres, gerando situações perigosas.\n- Movimentação do trem: Se o trem estiver em operação, há risco de partida repentina ou movimentação inesperada."
+      },
+      {
+        "KM": 100.2,
+        "Restrição": "PASSAGEM INFERIOR",
+        "Risco": "Os riscos de caminhar em local onde tem PI (Passagem inferior) deve-se ter atenção:\n\n⚠️ Riscos de Acidente\n- Quedas de altura: Se houver necessidade de acessar áreas elevadas ou bordas próximas à passagem inferior, há risco de queda.\n- Desníveis e obstáculos: O terreno pode ser irregular e ter materiais de rejeito da via permanente, que aumentam o risco de tropeços ou escorregões.\n- Colisão com veículos: Se a passagem inferior estiver sobre uma via ativa, há risco de atropelamento ou colisão com veículos em movimento."
+      },
+      {
+        "KM": 107.1,
+        "Restrição": "PASSAGEM INFERIOR",
+        "Risco": "Os riscos de caminhar em local onde tem PI (Passagem inferior) deve-se ter atenção:\n\n⚠️ Riscos de Acidente\n- Quedas de altura: Se houver necessidade de acessar áreas elevadas ou bordas próximas à passagem inferior, há risco de queda.\n- Desníveis e obstáculos: O terreno pode ser irregular e ter materiais de rejeito da via permanente, que aumentam o risco de tropeços ou escorregões.\n- Colisão com veículos: Se a passagem inferior estiver sobre uma via ativa, há risco de atropelamento ou colisão com veículos em movimento."
+      },
+      {
+        "KM": 114.07,
+        "Restrição": "PONTE",
+        "Risco": "Os riscos de caninhar ou revistar um trem sobre uma ponte envolve riscos críticos que exigem planejamento rigoroso e medidas de segurança reforçada:\n\n⚠️ Riscos de Acidente\n- Altura elevada: Quedas podem ser fatais. A ausência de guarda-corpos ou barreiras laterais aumenta o risco.\n- Espaço limitado para circulação: Pontes ferroviárias geralmente têm passagens estreitas, dificultando a movimentação segura da equipe.\n- Ausência de rota de fuga: Em caso de emergência ou aproximação de um trem, pode não haver espaço ou tempo suficiente para evacuação. \n\n🌬️ Riscos Ambientais\n- Vento forte: Em áreas elevadas ou abertas, rajadas de vento podem desequilibrar quem está caminhando ou revistando.\n- Condições climáticas adversas: Chuva, neblina ou piso molhado aumentam o risco de escorregões e dificultam a visibilidade. \n\n- Vibração da estrutura: A passagem do trem pode causar instabilidade na ponte, dificultando a inspeção e aumentando o risco de queda de objetos ou pessoas.\n\n🧱 Riscos Estruturais\n- Estrutura escorregadia: Trilhos e passarelas metálicas podem ser escorregadias, especialmente com umidade.\n- Desgaste ou corrosão: Pontes antigas podem apresentar falhas estruturais que comprometem a segurança da operação."
+      },
+      {
+        "KM": 116.25,
+        "Restrição": "PN",
+        "Risco": "Revistar um trem próximo a uma PN (Passagem de Nível) envolve riscos específicos que exigem atenção especial:\n\n⚠️ Riscos de Acidente\n- Trânsito de veículos e pedestres: A movimentação constante aumenta o risco de atropelamentos ou colisões durante a operação.\n- Interferência na sinalização: A presença da equipe pode confundir motoristas ou pedestres, gerando situações perigosas.\n- Movimentação do trem: Se o trem estiver em operação, há risco de partida repentina ou movimentação inesperada."
+      },
+      {
+        "KM": 120.0,
+        "Restrição": "PASSAGEM INFERIOR",
+        "Risco": "Os riscos de caminhar em local onde tem PI (Passagem inferior) deve-se ter atenção:\n\n⚠️ Riscos de Acidente\n- Quedas de altura: Se houver necessidade de acessar áreas elevadas ou bordas próximas à passagem inferior, há risco de queda.\n- Desníveis e obstáculos: O terreno pode ser irregular e ter materiais de rejeito da via permanente, que aumentam o risco de tropeços ou escorregões.\n- Colisão com veículos: Se a passagem inferior estiver sobre uma via ativa, há risco de atropelamento ou colisão com veículos em movimento."
+      },
+      {
+        "KM": 120.322,
+        "Restrição": "PN",
+        "Risco": "Revistar um trem próximo a uma PN (Passagem de Nível) envolve riscos específicos que exigem atenção especial:\n\n⚠️ Riscos de Acidente\n- Trânsito de veículos e pedestres: A movimentação constante aumenta o risco de atropelamentos ou colisões durante a operação.\n- Interferência na sinalização: A presença da equipe pode confundir motoristas ou pedestres, gerando situações perigosas.\n- Movimentação do trem: Se o trem estiver em operação, há risco de partida repentina ou movimentação inesperada."
+      },
+      {
+        "KM": 120.445,
+        "Restrição": "PASSAGEM INFERIOR",
+        "Risco": "Os riscos de caminhar em local onde tem PI (Passagem inferior) deve-se ter atenção:\n\n⚠️ Riscos de Acidente\n- Quedas de altura: Se houver necessidade de acessar áreas elevadas ou bordas próximas à passagem inferior, há risco de queda.\n- Desníveis e obstáculos: O terreno pode ser irregular e ter materiais de rejeito da via permanente, que aumentam o risco de tropeços ou escorregões.\n- Colisão com veículos: Se a passagem inferior estiver sobre uma via ativa, há risco de atropelamento ou colisão com veículos em movimento."
+      },
+      {
+        "KM": 121.735,
+        "Restrição": "PN",
+        "Risco": "Revistar um trem próximo a uma PN (Passagem de Nível) envolve riscos específicos que exigem atenção especial:\n\n⚠️ Riscos de Acidente\n- Trânsito de veículos e pedestres: A movimentação constante aumenta o risco de atropelamentos ou colisões durante a operação.\n- Interferência na sinalização: A presença da equipe pode confundir motoristas ou pedestres, gerando situações perigosas.\n- Movimentação do trem: Se o trem estiver em operação, há risco de partida repentina ou movimentação inesperada."
+      },
+      {
+        "KM": 123.394,
+        "Restrição": "PN",
+        "Risco": "Revistar um trem próximo a uma PN (Passagem de Nível) envolve riscos específicos que exigem atenção especial:\n\n⚠️ Riscos de Acidente\n- Trânsito de veículos e pedestres: A movimentação constante aumenta o risco de atropelamentos ou colisões durante a operação.\n- Interferência na sinalização: A presença da equipe pode confundir motoristas ou pedestres, gerando situações perigosas.\n- Movimentação do trem: Se o trem estiver em operação, há risco de partida repentina ou movimentação inesperada."
+      },
+      {
+        "KM": 127.793,
+        "Restrição": "PN",
+        "Risco": "Revistar um trem próximo a uma PN (Passagem de Nível) envolve riscos específicos que exigem atenção especial:\n\n⚠️ Riscos de Acidente\n- Trânsito de veículos e pedestres: A movimentação constante aumenta o risco de atropelamentos ou colisões durante a operação.\n- Interferência na sinalização: A presença da equipe pode confundir motoristas ou pedestres, gerando situações perigosas.\n- Movimentação do trem: Se o trem estiver em operação, há risco de partida repentina ou movimentação inesperada."
+      },
+      {
+        "KM": 139.503,
+        "Restrição": "PN",
+        "Risco": "Revistar um trem próximo a uma PN (Passagem de Nível) envolve riscos específicos que exigem atenção especial:\n\n⚠️ Riscos de Acidente\n- Trânsito de veículos e pedestres: A movimentação constante aumenta o risco de atropelamentos ou colisões durante a operação.\n- Interferência na sinalização: A presença da equipe pode confundir motoristas ou pedestres, gerando situações perigosas.\n- Movimentação do trem: Se o trem estiver em operação, há risco de partida repentina ou movimentação inesperada."
+      },
+      {
+        "KM": 141.463,
+        "Restrição": "PN",
+        "Risco": "Revistar um trem próximo a uma PN (Passagem de Nível) envolve riscos específicos que exigem atenção especial:\n\n⚠️ Riscos de Acidente\n- Trânsito de veículos e pedestres: A movimentação constante aumenta o risco de atropelamentos ou colisões durante a operação.\n- Interferência na sinalização: A presença da equipe pode confundir motoristas ou pedestres, gerando situações perigosas.\n- Movimentação do trem: Se o trem estiver em operação, há risco de partida repentina ou movimentação inesperada."
+      },
+      {
+        "KM": 145.88,
+        "Restrição": "PN",
+        "Risco": "Revistar um trem próximo a uma PN (Passagem de Nível) envolve riscos específicos que exigem atenção especial:\n\n⚠️ Riscos de Acidente\n- Trânsito de veículos e pedestres: A movimentação constante aumenta o risco de atropelamentos ou colisões durante a operação.\n- Interferência na sinalização: A presença da equipe pode confundir motoristas ou pedestres, gerando situações perigosas.\n- Movimentação do trem: Se o trem estiver em operação, há risco de partida repentina ou movimentação inesperada."
+      },
+      {
+        "KM": 147.751,
+        "Restrição": "PN",
+        "Risco": "Revistar um trem próximo a uma PN (Passagem de Nível) envolve riscos específicos que exigem atenção especial:\n\n⚠️ Riscos de Acidente\n- Trânsito de veículos e pedestres: A movimentação constante aumenta o risco de atropelamentos ou colisões durante a operação.\n- Interferência na sinalização: A presença da equipe pode confundir motoristas ou pedestres, gerando situações perigosas.\n- Movimentação do trem: Se o trem estiver em operação, há risco de partida repentina ou movimentação inesperada."
+      },
+      {
+        "KM": 151.484,
+        "Restrição": "PN",
+        "Risco": "Revistar um trem próximo a uma PN (Passagem de Nível) envolve riscos específicos que exigem atenção especial:\n\n⚠️ Riscos de Acidente\n- Trânsito de veículos e pedestres: A movimentação constante aumenta o risco de atropelamentos ou colisões durante a operação.\n- Interferência na sinalização: A presença da equipe pode confundir motoristas ou pedestres, gerando situações perigosas.\n- Movimentação do trem: Se o trem estiver em operação, há risco de partida repentina ou movimentação inesperada."
+      },
+      {
+        "KM": 153.767,
+        "Restrição": "PN",
+        "Risco": "Revistar um trem próximo a uma PN (Passagem de Nível) envolve riscos específicos que exigem atenção especial:\n\n⚠️ Riscos de Acidente\n- Trânsito de veículos e pedestres: A movimentação constante aumenta o risco de atropelamentos ou colisões durante a operação.\n- Interferência na sinalização: A presença da equipe pode confundir motoristas ou pedestres, gerando situações perigosas.\n- Movimentação do trem: Se o trem estiver em operação, há risco de partida repentina ou movimentação inesperada."
+      },
+      {
+        "KM": 155.821,
+        "Restrição": "PN",
+        "Risco": "Revistar um trem próximo a uma PN (Passagem de Nível) envolve riscos específicos que exigem atenção especial:\n\n⚠️ Riscos de Acidente\n- Trânsito de veículos e pedestres: A movimentação constante aumenta o risco de atropelamentos ou colisões durante a operação.\n- Interferência na sinalização: A presença da equipe pode confundir motoristas ou pedestres, gerando situações perigosas.\n- Movimentação do trem: Se o trem estiver em operação, há risco de partida repentina ou movimentação inesperada."
+      },
+      {
+        "KM": 164.18,
+        "Restrição": "PONTE",
+        "Risco": "Os riscos de caninhar ou revistar um trem sobre uma ponte envolve riscos críticos que exigem planejamento rigoroso e medidas de segurança reforçada:\n\n⚠️ Riscos de Acidente\n- Altura elevada: Quedas podem ser fatais. A ausência de guarda-corpos ou barreiras laterais aumenta o risco.\n- Espaço limitado para circulação: Pontes ferroviárias geralmente têm passagens estreitas, dificultando a movimentação segura da equipe.\n- Ausência de rota de fuga: Em caso de emergência ou aproximação de um trem, pode não haver espaço ou tempo suficiente para evacuação. \n\n🌬️ Riscos Ambientais\n- Vento forte: Em áreas elevadas ou abertas, rajadas de vento podem desequilibrar quem está caminhando ou revistando.\n- Condições climáticas adversas: Chuva, neblina ou piso molhado aumentam o risco de escorregões e dificultam a visibilidade. \n\n- Vibração da estrutura: A passagem do trem pode causar instabilidade na ponte, dificultando a inspeção e aumentando o risco de queda de objetos ou pessoas.\n\n🧱 Riscos Estruturais\n- Estrutura escorregadia: Trilhos e passarelas metálicas podem ser escorregadias, especialmente com umidade.\n- Desgaste ou corrosão: Pontes antigas podem apresentar falhas estruturais que comprometem a segurança da operação."
+      },
+      {
+        "KM": 165.305,
+        "Restrição": "PONTE",
+        "Risco": "Os riscos de caninhar ou revistar um trem sobre uma ponte envolve riscos críticos que exigem planejamento rigoroso e medidas de segurança reforçada:\n\n⚠️ Riscos de Acidente\n- Altura elevada: Quedas podem ser fatais. A ausência de guarda-corpos ou barreiras laterais aumenta o risco.\n- Espaço limitado para circulação: Pontes ferroviárias geralmente têm passagens estreitas, dificultando a movimentação segura da equipe.\n- Ausência de rota de fuga: Em caso de emergência ou aproximação de um trem, pode não haver espaço ou tempo suficiente para evacuação. \n\n🌬️ Riscos Ambientais\n- Vento forte: Em áreas elevadas ou abertas, rajadas de vento podem desequilibrar quem está caminhando ou revistando.\n- Condições climáticas adversas: Chuva, neblina ou piso molhado aumentam o risco de escorregões e dificultam a visibilidade. \n\n- Vibração da estrutura: A passagem do trem pode causar instabilidade na ponte, dificultando a inspeção e aumentando o risco de queda de objetos ou pessoas.\n\n🧱 Riscos Estruturais\n- Estrutura escorregadia: Trilhos e passarelas metálicas podem ser escorregadias, especialmente com umidade.\n- Desgaste ou corrosão: Pontes antigas podem apresentar falhas estruturais que comprometem a segurança da operação."
+      }
     ];
 
     // 2. FUNÇÕES DO APLICATIVO
     function filtrar() {
       const kmInicialInput = document.getElementById("kmInicial");
       const kmFinalInput = document.getElementById("kmFinal");
-      
+      const riscoMensagem = document.getElementById("risco-mensagem");
+
       kmInicialInput.classList.remove('error');
       kmFinalInput.classList.remove('error');
+      riscoMensagem.innerHTML = ""; // Limpa a lista de riscos
 
       const kmInicial = parseFloat(kmInicialInput.value);
       const kmFinal = parseFloat(kmFinalInput.value);
 
       if (isNaN(kmInicial) || isNaN(kmFinal)) {
         exibirTabela([], 'Por favor, preencha ambos os campos de quilometragem corretamente.');
-        if(isNaN(kmInicial)) kmInicialInput.classList.add('error');
-        if(isNaN(kmFinal)) kmFinalInput.classList.add('error');
+        if (isNaN(kmInicial)) kmInicialInput.classList.add('error');
+        if (isNaN(kmFinal)) kmFinalInput.classList.add('error');
         return;
       }
-      
+
       if (kmInicial > kmFinal) {
         exibirTabela([], 'A quilometragem inicial não pode ser maior que a final.');
         kmInicialInput.classList.add('error');
@@ -256,6 +736,18 @@
         return !isNaN(km) && km >= kmInicial && km <= kmFinal;
       });
 
+      const riscosUnicos = [...new Set(filtrado.map(row => row.Risco))];
+
+      if (riscosUnicos.length > 0) {
+        riscosUnicos.forEach(risco => {
+          const li = document.createElement('li');
+          li.innerHTML = risco; // Usar innerHTML para interpretar a quebra de linha <br>
+          riscoMensagem.appendChild(li);
+        });
+      } else {
+        riscoMensagem.innerHTML = '<li>Nenhum risco encontrado.</li>';
+      }
+
       exibirTabela(filtrado, 'Nenhum resultado encontrado para este intervalo.');
     }
 
@@ -263,7 +755,7 @@
       const tabela = document.getElementById("resultado");
       const thead = tabela.querySelector('thead');
       const tbody = tabela.querySelector('tbody');
-      
+
       thead.innerHTML = "";
       tbody.innerHTML = "";
 
@@ -272,11 +764,15 @@
         return;
       }
 
-      const cabecalho = Object.keys(data[0]);
+      // Define as colunas a serem exibidas na tabela
+      const cabecalho = ["KM", "Restrição"];
       thead.innerHTML = "<tr>" + cabecalho.map(col => `<th>${col}</th>`).join("") + "</tr>";
 
       data.forEach(row => {
-        let linha = "<tr>" + cabecalho.map(col => `<td>${row[col]}</td>`).join("") + "</tr>";
+        // Cria a linha da tabela apenas com as colunas KM e Restrição
+        const km = row.KM;
+        const restricao = row.Restrição;
+        const linha = `<tr><td>${km}</td><td>${restricao}</td></tr>`;
         tbody.innerHTML += linha;
       });
     }
@@ -284,81 +780,73 @@
     // =================================================================================
     // LÓGICA PARA PROGRESSIVE WEB APP (PWA) OFFLINE
     // =================================================================================
-    
-    // Gera o conteúdo do Service Worker dinamicamente
+
     const swContent = `
-        const CACHE_NAME = 'aux-ar-cache-v1';
-        // A URL a ser cacheada é a própria página que iniciou o service worker.
-        // self.location.pathname garante que funcione mesmo se o nome do arquivo mudar.
-        const urlsToCache = [self.location.pathname];
+        const CACHE_NAME = 'aux-ar-cache-v1';
+        const urlsToCache = [self.location.pathname];
 
-        self.addEventListener('install', event => {
-            event.waitUntil(
-                caches.open(CACHE_NAME)
-                    .then(cache => {
-                        console.log('Cache aberto');
-                        return cache.addAll(urlsToCache);
-                    })
-            );
-        });
+        self.addEventListener('install', event => {
+            event.waitUntil(
+                caches.open(CACHE_NAME)
+                    .then(cache => {
+                        console.log('Cache aberto');
+                        return cache.addAll(urlsToCache);
+                    })
+            );
+        });
 
-        self.addEventListener('fetch', event => {
-            event.respondWith(
-                caches.match(event.request)
-                    .then(response => {
-                        // Se encontrar no cache, retorna. Senão, tenta buscar na rede.
-                        return response || fetch(event.request);
-                    })
-            );
-        });
-    `;
+        self.addEventListener('fetch', event => {
+            event.respondWith(
+                caches.match(event.request)
+                    .then(response => {
+                        return response || fetch(event.request);
+                    })
+            );
+        });
+    `;
 
-    // Gera o conteúdo do Manifesto do App dinamicamente
     const manifestContent = {
-        "name": "Auxiliador de AR",
-        "short_name": "Aux. AR",
-        "start_url": ".",
-        "display": "standalone",
-        "background_color": "#f8f9fa",
-        "theme_color": "#007bff",
-        "description": "Ferramenta para filtrar pontos de restrição por quilometragem.",
-        "icons": [
-            {
-              "src": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxOTIgMTkyIiB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiI+PHBhdGggZmlsbD0ibm9uZSIgZD0iTTAgMGgxOTJ2MTkySDB6Ii8+PHBhdGggZmlsbD0iIzAwN2JmZiIgZD0iTTk2IDIzYTczIDczIDAgMSAwIDAgMTQ2IDczIDczIDAgMCAwIDAtMTQ2Wm0wIDE2YTQ5LjQxIDQ5LjQxIDAgMCAxIDM1IDg0LjM5QTU3IDU3IDAgMSAxIDk2IDM5WiIvPjxwYXRoIGZpbGw9IiMwMDdiZmYiIGQ9Im0xMzEgODRhMzUgMzUgMCAxIDEgMCAxIDM1IDM1IDAgMCAxIDAtMVoiLz48L3N2Zz4=",
-              "sizes": "192x192",
-              "type": "image/svg+xml"
-            },
-            {
-              "src": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIiB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiI+PHBhdGggZmlsbD0ibm9uZSIgZD0iTTAgMGg1MTJ2NTEySDB6Ii8+PHBhdGggZmlsbD0iIzAwN2JmZiIgZD0iTTI1NiA1NkExOTIgMTkyIDAgMSAwIDQ0OCAyNDggMTkyIDE5MiAwIDAgMCAyNTYgNTZabTAgMzMyYTExNi42NSAxMTYuNjUgMCAwIDEgODIgMTk4LjQ0QTE0MCAxNDAgMCAxIDEgMjU2IDg4YTE0MCAxNDAgMCAwIDEgMCAyODBaIi8+PHBhdGggZmlsbD0iIzAwN2JmZiIgZD0ibTMzOCAxOTZhODQgODQgMCAxIDEgMCAuMjFaIi8+PC9zdmc+",
-              "sizes": "512x512",
-              "type": "image/svg+xml"
-            }
-        ]
+      "name": "Auxiliador de AR",
+      "short_name": "Aux. AR",
+      "start_url": ".",
+      "display": "standalone",
+      "background_color": "#f8f9fa",
+      "theme_color": "#007bff",
+      "description": "Ferramenta para filtrar pontos de restrição por quilometragem.",
+      "icons": [
+        {
+          "src": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxOTIgMTkyIiB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiI+PHBhdGggZmlsbD0ibm9uZSIgZD0iTTAgMGgxOTJ2MTkySDB6Ii8+PHBhdGggZmlsbD0iIzAwN2JmZiIgZD0iTTk2IDIzYTczIDczIDAgMSAwIDAgMTQ2IDczIDczIDAgMCAwIDAtMTQ2Wm0wIDE2YTQ5LjQxIDQ5LjQxIDAgMCAxIDM1IDg0LjM5QTU3IDU3IDAgMSAxIDk2IDM5WiIvPjxwYXRoIGZpbGw9IiMwMDdiZmYiIGQ9Im0xMzEgODRhMzUgMzUgMCAxIDEgMCAxIDM1IDM1IDAgMCAxIDAtMVoiLz48L3N2Zz4=",
+          "sizes": "192x192",
+          "type": "image/svg+xml"
+        },
+        {
+          "src": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIiB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiI+PHBhdGggZmlsbD0ibm9uZSIgZD0iTTAgMGg1MTJ2NTEySDB6Ii8+PHBhdGggZmlsbD0iIzAwN2JmZiIgZD0iTTI1NiA1NkExOTIgMTkyIDAgMSAwIDQ0OCAyNDggMTkyIDE5MiAwIDAgMCAyNTYgNTZabTAgMzMyYTExNi42NSAxMTYuNjUgMCAwIDEgODIgMTk4LjQ0QTE0MCAxNDAgMCA1IDEgMjU2IDg4YTE0MCAxNDAgMCAwIDEgMCAyODBaIi8+PHBhdG-ZpbGw9IiMwMDdiZmYiIGQ9Im0zMzggMTk2Yzg0IDg0IDAgMSAxIDAgLjIxWiIvPjwvc3ZnPg==",
+          "sizes": "512x512",
+          "type": "image/svg+xml"
+        }
+      ]
     };
 
-    // Função para registrar o Service Worker e o Manifesto
     function registerPWA() {
-        // 1. Registra o Service Worker
-        if ('serviceWorker' in navigator) {
-            const swBlob = new Blob([swContent], { type: 'application/javascript' });
-            const swUrl = URL.createObjectURL(swBlob);
-            navigator.serviceWorker.register(swUrl)
-                .then(registration => console.log('Service Worker registrado com sucesso:', registration))
-                .catch(error => console.log('Falha ao registrar Service Worker:', error));
-        }
+      if ('serviceWorker' in navigator) {
+        const swBlob = new Blob([swContent], { type: 'application/javascript' });
+        const swUrl = URL.createObjectURL(swBlob);
+        navigator.serviceWorker.register(swUrl)
+          .then(registration => console.log('Service Worker registrado com sucesso:', registration))
+          .catch(error => console.log('Falha ao registrar Service Worker:', error));
+      }
 
-        // 2. Anexa o Manifesto
-        const manifestBlob = new Blob([JSON.stringify(manifestContent)], { type: 'application/json' });
-        const manifestUrl = URL.createObjectURL(manifestBlob);
-        const linkElement = document.createElement('link');
-        linkElement.rel = 'manifest';
-        linkElement.href = manifestUrl;
-        document.head.appendChild(linkElement);
+      const manifestBlob = new Blob([JSON.stringify(manifestContent)], { type: 'application/json' });
+      const manifestUrl = URL.createObjectURL(manifestBlob);
+      const linkElement = document.createElement('link');
+      linkElement.rel = 'manifest';
+      linkElement.href = manifestUrl;
+      document.head.appendChild(linkElement);
     }
 
-    // Inicia o registro do PWA quando a página carregar
     window.addEventListener('load', registerPWA);
 
   </script>
 </body>
+
 </html>
